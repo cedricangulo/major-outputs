@@ -1,0 +1,704 @@
+---
+title: Laboratory 2
+---
+
+### My Task
+
+Convert your assigned forms into a form of App using any of the ionic tags and html tags that you just recently learned.
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzL6kpuwo3Tcju0B4CeroXDNlU7tygV1xTI9GiS"
+  alt="Original Form"
+  width={1545}
+  height={868}
+/>
+
+---
+
+### Code
+
+<Files className="mt-4">
+  <Folder name="application-form" defaultOpen>
+    <Folder name="node_modules" disabled />
+    <Folder name="src" defaultOpen>
+      <Folder name="app" defaultOpen>
+        <Folder name="home" defaultOpen>
+          <File name="home.page.html" />
+          <File name="home.page.scss" />
+        </Folder>
+      </Folder>
+      <Folder name="themes" defaultOpen>
+        <File name="variables.scss" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+<Tabs items={["home.page.html", "home.page.scss", "variables.scss"]}>
+<Tab value="home.page.html">
+```html title="home.page.html"
+<!-- Home Page Component Template for APMC-HKNP Application Form -->
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>APMC - HKNP Application Form</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">APMC - HKNP Application Form</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Banner Section: Displays army vision statement and logos -->
+  <div class="banner">
+    <img class="banner-image" src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLraArQNEkNiYSsU7O0X5EnvKmAFRQZDh12C6t" alt="banner" />
+    <div class="banner-content">
+      <div class="banner-logos">
+        <img
+          src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLMq0xjjWfeDhvGriBnSwWQ8HNJjd1sP0V9y6C"
+          alt="Army Personal Management Center" 
+        />
+        <img
+          src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLpvwavBS2CB4Uqd0Qm58wG91yTMnftHAVcKYo"
+          alt="Hukbong Katihan Ng Pilipinas" 
+        />
+      </div>
+      <h2 class="vision">
+        By 2028, a world-class Army that is a source of national pride
+      </h2>
+    </div>
+  </div>
+
+  <!-- Main Form Content: Container for all application form sections -->
+  <div class="form-container">
+    <!-- Basic Information Section: Collects user's name, rank, AFPSN, and 2x2 picture placeholder -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Basic Information</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="basic-info-row">
+          <div class="picture-placeholder">
+            <div class="picture-box">
+              <ion-icon
+                name="person-outline"
+                size="large"
+              ></ion-icon>
+              <p>2x2 Picture</p>
+            </div>
+          </div>
+
+          <div class="form-fields">
+            <ion-item>
+              <ion-label position="stacked">Name</ion-label>
+              <ion-input type="text"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Rank</ion-label>
+              <ion-input type="text"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">AFPSN/Reserve</ion-label>
+              <ion-input type="text"></ion-input>
+            </ion-item>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Application Type Section: Radio buttons for selecting OCC or OPC course -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Application Type</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label>Applying for</ion-label>
+        </ion-item>
+        <ion-radio-group>
+          <ion-item>
+            <ion-radio slot="start"></ion-radio>
+            <ion-label>Officer Candidate Course (OCC)</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-radio slot="start"></ion-radio>
+            <ion-label>Officer Preparatory Course (OPC)</ion-label>
+          </ion-item>
+        </ion-radio-group>
+      </ion-card-content>
+    </ion-card>
+    
+    <!-- Contact Details Section: Collects address, telephone, mobile, and email information -->
+    <ion-card>
+      <!-- Application Requirements -->
+      <div class="instructions-card">
+        <ion-icon name="shield-checkmark" class="callout-icon"></ion-icon>
+        <div class="callout-content">
+          <strong>Application Requirements</strong>
+          <p>Ensure all information matches your official military records and identification documents.</p>
+        </div>
+      </div>
+      <ion-card-header>
+        <ion-card-title>Contact Details</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Address</ion-label>
+          <ion-textarea
+            placeholder="123 Main Street, Barangay, City, Province"
+            rows="2"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Telephone No</ion-label>
+          <ion-input
+            type="tel"
+            placeholder="(02) 123-4567"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Mobile No</ion-label>
+          <ion-input
+            type="tel"
+            placeholder="09123456789"
+          ></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Email Address</ion-label>
+          <ion-input
+            type="email"
+            placeholder="juan.dela.cruz@email.com"
+          ></ion-input>
+        </ion-item>
+      </ion-card-content>
+      <!-- Personal Details Section: Collects age, birth date, nationality, religion, gender, height, civil status -->
+      <ion-card-header>
+        <ion-card-title>Personal Details</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Age</ion-label>
+          <ion-input
+            type="number"
+            placeholder="25"
+            min="21"
+            max="27"
+          ></ion-input>
+        </ion-item>
+
+      <!-- Date of Birth Input: Uses Ionic datetime modal for date selection -->
+        <ion-item>
+          <ion-label position="stacked">Date of Birth</ion-label>
+          <ion-datetime-button datetime="birthdate"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime
+                id="birthdate"
+                presentation="date"></ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Nationality</ion-label>
+          <ion-input type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Religion</ion-label>
+          <ion-input type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Gender</ion-label>
+          <ion-select placeholder="Select gender">
+            <ion-select-option value="male">Male</ion-select-option>
+            <ion-select-option value="female">Female</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Height</ion-label>
+          <ion-input
+            type="text"
+            placeholder="170 cm"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Civil Status</ion-label>
+          <ion-select placeholder="Select civil status">
+            <ion-select-option value="single">Single</ion-select-option>
+            <ion-select-option value="married">Married</ion-select-option>
+            <ion-select-option value="divorced">Divorced</ion-select-option>
+            <ion-select-option value="widowed">Widowed</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Encouragement Message -->
+    <div class="encouragement-card">
+      <ion-icon name="heart" class="callout-icon"></ion-icon>
+      <div class="callout-content">
+        <strong>Best of Luck</strong>
+        <p>May God bless your application and guide you in your journey to serve our beloved Philippines.</p>
+      </div>
+    </div>
+
+    <!-- Submit Section: Button to submit the application -->
+    <div class="submit-section">
+      <ion-button
+        expand="block"
+        size="large"
+        color="primary"
+      >
+        <ion-icon
+          slot="start"
+          name="checkmark-outline"
+        ></ion-icon>
+        Submit Application
+      </ion-button>
+    </div>
+  </div>
+</ion-content>
+```
+</Tab>
+<Tab value="home.page.scss">
+```scss title="home.page.scss"
+// Home Page Styles for APMC-HKNP Application Form
+
+.banner {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  max-height: 380px;
+  margin-bottom: 2rem;
+
+  .banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+  }
+
+  // Banner content overlay with logos and vision text
+  .banner-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem 1rem;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+
+    .banner-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+
+      img {
+        max-height: 120px;
+        width: auto;
+      }
+    }
+
+    .vision {
+      max-width: 25ch;
+      margin: auto;
+      color: var(--ion-color-warning);
+      font-style: normal;
+      // Safe mode fallbacks for cross browser compatibility
+      font-family:
+        "Black Ops One",
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        Roboto,
+        "Noto Sans",
+        Ubuntu,
+        Cantarell,
+        "Helvetica Neue";
+      font-weight: 700;
+      font-size: 32px;
+      line-height: 36px;
+      text-align: center;
+    }
+  }
+}
+
+ion-header {
+  box-shadow: none;
+  border-bottom: 0.0625rem solid var(--ion-border-color);
+}
+
+ion-header ion-title {
+  color: var(--ion-text-color);
+
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+// Main form container styles
+.form-container {
+  padding: 1rem;
+  max-width: 40rem;
+  margin: 0 auto;
+
+  ion-card {
+    margin: 0;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    background: var(--ion-card-background);
+    border: 0.0625rem solid var(--ion-border-color);
+    box-shadow:
+      0rem 0rem 0rem 0.125rem var(--ion-card-background),
+      0rem 0.0625rem 0.0625rem rgba(0, 0, 0, 0.0509804),
+      0rem 0.5625rem 1.25rem rgba(0, 0, 0, 0.0509804),
+      0rem 1.25rem 2.65625rem rgba(0, 0, 0, 0.0392157),
+      0rem 0rem 0rem 0.1875rem var(--ion-border-color);
+
+    ion-card-header {
+      padding-bottom: 1.5rem;
+
+      ion-card-title {
+        color: var(--ion-text-color);
+        font-size: 24px;
+        line-height: 32px;
+        font-weight: 600;
+      }
+    }
+
+    ion-card-content {
+      padding-top: 0;
+    }
+  }
+
+  // Instructions callout card styles
+  .instructions-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    margin: 1rem 1rem 0 1rem;
+    border-radius: 0.5rem;
+    background: var(--ion-color-primary-tint);
+    border: 0.0625rem solid var(--ion-color-primary-shade);
+
+    .callout-icon {
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+      color: var(--ion-color-primary-contrast);
+      font-size: 1.25rem;
+    }
+
+    .callout-content {
+      flex: 1;
+      color: var(--ion-color-primary-contrast);
+
+      strong {
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  // Encouragement card styles (Best of Luck)
+  .encouragement-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    margin: 1rem 1rem 0 1rem;
+    border-radius: 0.5rem;
+    background: var(--ion-color-warning-tint);
+    border: 0.0625rem solid var(--ion-color-warning);
+
+    .callout-icon {
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+      color: var(--ion-color-warning-contrast);
+      font-size: 1.25rem;
+    }
+
+    .callout-content {
+      flex: 1;
+      color: var(--ion-color-warning-contrast);
+
+      strong {
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  // Basic information row layout styles
+  .basic-info-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .form-fields {
+      flex: 1;
+      width: 100%;
+    }
+
+    .picture-placeholder {
+      flex: 1;
+      min-width: 9.375rem;
+
+      .picture-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 9.375rem;
+        border-radius: 0.5rem;
+        border: 0.125rem dashed var(--ion-color-primary-contrast);
+        background: var(--ion-color-light);
+        transition: all 0.3s ease;
+
+        ion-icon {
+          margin-bottom: 0.625rem;
+          color: var(--ion-color-medium);
+        }
+
+        p {
+          margin: 0;
+          color: var(--ion-color-medium);
+          font-size: 0.75rem;
+        }
+
+        &:hover {
+          border-color: var(--ion-color-primary);
+          background: var(--ion-color-light-shade);
+          color: var(--ion-color-medium-contrast);
+        }
+      }
+    }
+  }
+
+  // Form input styles
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --border-color: transparent;
+    overflow: visible;
+    margin-bottom: 1rem;
+    ion-radio {
+      margin-right: 0.75rem;
+    }
+  }
+
+  ion-label {
+    margin-bottom: 0.75rem;
+    color: var(--ion-text-color);
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 500;
+  }
+
+  ion-item ion-input,
+  ion-item ion-textarea,
+  ion-item ion-select {
+    --padding-start: 0.75rem;
+    --padding-end: 0.75rem;
+    width: 100%;
+    height: 3rem;
+    border-radius: 0.5rem;
+    background: var(--ion-item-background);
+    border: 0.0625rem solid var(--ion-border-color);
+    color: var(--ion-text-color);
+  }
+
+  ion-item ion-textarea {
+    --padding-top: 0.75rem;
+    --padding-bottom: 0.75rem;
+    height: auto;
+    min-height: 6rem;
+  }
+
+  ion-item ion-input:focus-within,
+  ion-item ion-textarea:focus-within,
+  ion-item ion-select:focus-within {
+    outline: 2px solid #4a5d23;
+    border-color: transparent;
+    transition: all 0.2s ease-in;
+  }
+
+  // Submit section styles
+  .submit-section {
+    margin-top: 1.875rem;
+    padding: 1.25rem 0;
+
+    ion-button {
+      --border-radius: 0.5rem;
+      height: 3rem;
+      font-weight: 600;
+      text-transform: none;
+    }
+  }
+}
+
+// Responsive design for larger screens
+@media (min-width: 640px) {
+  .form-container {
+    ion-item ion-label,
+    ion-label {
+      margin-bottom: 0.75rem;
+      color: var(--ion-text-color);
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 500;
+    }
+
+    ion-card ion-card-header ion-card-title {
+      font-size: 30px;
+      line-height: 36px;
+    }
+  }
+}
+```
+</Tab>
+<Tab value="variables.scss">
+```scss title="variables.scss"
+@import url("https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+:root {
+  --ion-font-family:
+    "Quantico", -apple-system, "Segoe UI", Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue";
+
+  // Primary Colors - Army Green
+  --ion-color-primary: #4a5d23;
+  --ion-color-primary-rgb: 74, 93, 35;
+  --ion-color-primary-contrast: #f5f5f4;
+  --ion-color-primary-contrast-rgb: 245, 245, 244;
+  --ion-color-primary-shade: #414f1f;
+  --ion-color-primary-tint: #5c6d39;
+
+  // Secondary Colors - Olive
+  --ion-color-secondary: #5c5c42;
+  --ion-color-secondary-rgb: 92, 92, 66;
+  --ion-color-secondary-contrast: #f5f5f4;
+  --ion-color-secondary-contrast-rgb: 245, 245, 244;
+  --ion-color-secondary-shade: #51513a;
+  --ion-color-secondary-tint: #6c6c55;
+
+  // Warning - Army Gold
+  --ion-color-warning: #ffc107;
+  --ion-color-warning-rgb: 255, 193, 7;
+  --ion-color-warning-contrast: #1c1917;
+  --ion-color-warning-contrast-rgb: 28, 25, 23;
+  --ion-color-warning-shade: #e0aa06;
+  --ion-color-warning-tint: #ffc720;
+
+  // Medium/Light colors
+  --ion-color-medium: #78716c;
+  --ion-color-medium-rgb: 120, 113, 108;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #6a635f;
+  --ion-color-medium-tint: #86807b;
+
+  --ion-color-light: #e7e5e4;
+  --ion-color-light-rgb: 231, 229, 228;
+  --ion-color-light-contrast: #1c1917;
+  --ion-color-light-contrast-rgb: 28, 25, 23;
+  --ion-color-light-shade: #cbcac9;
+  --ion-color-light-tint: #e9e8e7;
+
+  // Background and Text
+  --ion-background-color: #f5f5f4;
+  --ion-background-color-rgb: 245, 245, 244;
+  --ion-text-color: #1c1917;
+  --ion-text-color-rgb: 28, 25, 23;
+
+  // Card and Surface Colors
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+  --ion-toolbar-background: #ffffff;
+
+  // Border Colors
+  --ion-border-color: #e7e5e4;
+  --ion-item-border-color: #e7e5e4;
+}
+
+// Dark Mode Army Theme
+@media (prefers-color-scheme: dark) {
+  :root {
+    // Primary Colors - Lighter Army Green for dark mode
+    --ion-color-primary: #8a9a5b;
+    --ion-color-primary-rgb: 138, 154, 91;
+    --ion-color-primary-contrast: #1c1c1c;
+    --ion-color-primary-contrast-rgb: 28, 28, 28;
+    --ion-color-primary-shade: #798750;
+    --ion-color-primary-tint: #96a46b;
+
+    // Secondary Colors
+    --ion-color-secondary: #8c8c73;
+    --ion-color-secondary-rgb: 140, 140, 115;
+    --ion-color-secondary-contrast: #1c1c1c;
+    --ion-color-secondary-contrast-rgb: 28, 28, 28;
+    --ion-color-secondary-shade: #7b7b65;
+    --ion-color-secondary-tint: #989881;
+
+    // Warning - Brighter Gold
+    --ion-color-warning: #ffd54f;
+    --ion-color-warning-rgb: 255, 213, 79;
+    --ion-color-warning-contrast: #1c1c1c;
+    --ion-color-warning-contrast-rgb: 28, 28, 28;
+    --ion-color-warning-shade: #e0bb46;
+    --ion-color-warning-tint: #ffda61;
+
+    // Background and Text
+    --ion-background-color: #1c1c1c;
+    --ion-background-color-rgb: 28, 28, 28;
+    --ion-text-color: #f5f5f4;
+    --ion-text-color-rgb: 245, 245, 244;
+
+    // Card and Surface Colors
+    --ion-card-background: #262626;
+    --ion-item-background: #262626;
+    --ion-toolbar-background: #1c1c1c;
+
+    // Border Colors
+    --ion-border-color: #3a3a3a;
+    --ion-item-border-color: #3a3a3a;
+
+    // Medium and Light adjustments for dark mode
+    --ion-color-medium: #a8a29e;
+    --ion-color-medium-rgb: 168, 162, 158;
+    --ion-color-light: #3a3a3a;
+    --ion-color-light-rgb: 58, 58, 58;
+
+    --ion-color-light-shade: #262626;
+  }
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+### My Output
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLjGPuSq1KieSW58T0LoPtzYNm3CbG2lvIqUOh"
+  alt="Output"
+  width={1920}
+  height={1080}
+/>

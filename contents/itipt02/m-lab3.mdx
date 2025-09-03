@@ -1,0 +1,371 @@
+---
+title: Laboratory 3
+---
+
+### My Task
+
+Develop an assessment app for the College of Agriculture.
+
+- Focus your questions on Crop Science and Sustainable Farming.
+- Prepare three multiple choice questions with 5 choice options.
+
+---
+
+### Code
+
+<Files className="mt-4">
+  <Folder name="application-form" defaultOpen>
+    <Folder name="node_modules" disabled />
+    <Folder name="src" defaultOpen>
+      <Folder name="app" defaultOpen>
+        <Folder name="home" defaultOpen>
+          <File name="home.page.html" />
+          <File name="home.page.scss" />
+        </Folder>
+      </Folder>
+      <Folder name="themes" defaultOpen>
+        <File name="variables.scss" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+<Tabs items={["home.page.html", "home.page.scss", "variables.scss"]}>
+<Tab value="home.page.html">
+```html title="home.page.html"
+<!-- Main header with translucent background for modern look -->
+<ion-header [translucent]="true">
+  <!-- Primary colored toolbar for consistent branding -->
+  <ion-toolbar color="primary">
+    <ion-title>
+      College of Agriculture
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Main content area with padding and fullscreen support -->
+<ion-content class="ion-padding" [fullscreen]="true">
+  <!-- Collapsible header for better UX on scroll -->
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">
+        <!-- Clipboard icon to represent assessment/testing -->
+        <ion-icon name="clipboard-outline" class="title-icon"></ion-icon>
+        Assessment Portal
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Background texture overlay for visual appeal -->
+  <div class="texture"></div>
+
+  <!-- Welcome banner section with background image -->
+  <div class="banner">
+    <img src="/assets/banner.webp" alt="House" />
+    <h1>Welcome to the College of Agriculture Assessment Portal</h1>
+  </div>
+
+  <!-- QUESTION 1: Plant Breeding and Heterosis (Crop Science) -->
+  <!-- Answer: C - Correct answer about hybrid vigor -->
+  <ion-card class="question-card">
+    <ion-card-header>
+      <ion-badge color="primary" class="question-badge">Question 1</ion-badge>
+      <ion-card-title>
+        In plant breeding, what is the significance of the term heterosis, and how does it relate to increasing crop yield and quality?
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-radio-group class="modern-radio-group" name="question1">
+        <ion-item lines="none">
+          <ion-radio slot="start" value="a"></ion-radio>
+          <ion-label>
+            It is the genetic phenomenon where two different plant species are crossed to create a sterile hybrid.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="b"></ion-radio>
+          <ion-label>
+            It refers to the self-pollination of a plant to preserve the traits of the parent line.
+          </ion-label>
+        </ion-item>
+        <!-- CORRECT ANSWER -->
+        <ion-item lines="none">
+          <ion-radio slot="start" value="c"></ion-radio>
+          <ion-label>
+            It is the increased vigor, growth, and yield in the offspring of genetically dissimilar parents.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="d"></ion-radio>
+          <ion-label>
+            It is the result of using a single parent line to produce genetically identical offspring.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="e"></ion-radio>
+          <ion-label>
+            It is a process that involves exposing seeds to radiation to induce random mutations.
+          </ion-label>
+        </ion-item>
+      </ion-radio-group>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- QUESTION 2: Sustainable Farming Practices -->
+  <!-- Answer: E - Correct answer about polyculture benefits -->
+  <ion-card class="question-card">
+    <ion-card-header>
+      <ion-badge color="secondary" class="question-badge">Question 2</ion-badge>
+      <ion-card-title>
+        A farmer is adopting a sustainable practice to improve soil health and reduce pest pressure. Instead of monoculture, they plant corn, beans, and squash together in the same field. Which of the following best describes this system and its primary benefit?
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-radio-group class="modern-radio-group" name="question2">
+        <ion-item lines="none">
+          <ion-radio slot="start" value="a"></ion-radio>
+          <ion-label>
+            Conservation tillage, which reduces soil erosion and increases water infiltration.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="b"></ion-radio>
+          <ion-label>
+            Agroforestry, which integrates trees and shrubs with crops to create a more resilient system.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="c"></ion-radio>
+          <ion-label>
+            Integrated Pest Management (IPM), which uses biological controls and careful monitoring to minimize pesticide use.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="d"></ion-radio>
+          <ion-label>
+            Crop rotation, which involves alternating different crops in the same area over a series of growing seasons.
+          </ion-label>
+        </ion-item>
+        <!-- CORRECT ANSWER -->
+        <ion-item lines="none">
+          <ion-radio slot="start" value="e"></ion-radio>
+          <ion-label>
+            Polyculture, which leverages synergistic relationships between plants, such as the beans fixing nitrogen for the corn.
+          </ion-label>
+        </ion-item>
+      </ion-radio-group>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- QUESTION 3: Cover Crops and Soil Health -->
+  <!-- Answer: E - Correct answer about nitrogen fixation -->
+  <ion-card class="question-card">
+    <ion-card-header>
+      <ion-badge color="tertiary" class="question-badge">Question 3</ion-badge>
+      <ion-card-title>
+        In the context of sustainable farming, the practice of using cover crops is often emphasized. When a farmer plants a legume cover crop, such as vetch, in the off-season, which specific soil health principle is being primarily addressed?
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-radio-group class="modern-radio-group" name="question3">
+        <ion-item lines="none">
+          <ion-radio slot="start" value="a"></ion-radio>
+          <ion-label>
+            Increasing the soil's organic matter and reducing evaporation.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="b"></ion-radio>
+          <ion-label>
+            Minimizing soil erosion and suppressing weed growth.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="c"></ion-radio>
+          <ion-label>
+            Maximizing the soil's carbon sequestration by increasing root biomass.
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-radio slot="start" value="d"></ion-radio>
+          <ion-label>
+            Enhancing biodiversity by providing a habitat for beneficial insects.
+          </ion-label>
+        </ion-item>
+        <!-- CORRECT ANSWER -->
+        <ion-item lines="none">
+          <ion-radio slot="start" value="e"></ion-radio>
+          <ion-label>
+            Improving soil fertility by introducing fixed atmospheric nitrogen into the soil.
+          </ion-label>
+        </ion-item>
+      </ion-radio-group>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Submit section for assessment completion -->
+  <div class="submit-section">
+    <!-- Full-width button for submission with icon -->
+    <ion-button expand="block" size="large">
+      <!-- Checkmark icon to indicate completion/submission -->
+      <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+      Submit Assessment
+    </ion-button>
+  </div>
+</ion-content>
+```
+</Tab>
+<Tab value="home.page.scss">
+```scss title="home.page.scss"
+/* Global title styling */
+ion-title {
+	text-align: center;
+	--color: #ffeece;
+}
+
+/* Content container positioning */
+ion-content {
+	position: relative;
+}
+
+/* Question option items styling */
+ion-item {
+	--background: var(--ion-background-color);
+	--background-hover: #eaca91;
+	border-radius: 1rem !important;
+	margin: 0.5rem 0;
+}
+
+/* Card title color override */
+ion-card-title {
+	--color: var(--ion-text-color) !important;
+}
+
+/* Welcome banner section */
+.banner {
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	max-width: 40rem;
+	max-height: 380px;
+	margin: 3rem auto;
+	border-radius: 1rem;
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 25%;
+	}
+
+	h1 {
+		position: absolute;
+		bottom: 2rem;
+		left: 0;
+		right: 0;
+		color: white;
+		text-shadow: 1px 1px 2px var(--ion-background-color);
+		text-align: center;
+		margin: auto;
+		max-width: 25ch;
+		font-size: 2rem;
+	}
+}
+
+/* Question card container */
+.question-card {
+	background-color: #d8c196;
+	border-radius: 1rem;
+	box-shadow: none !important;
+	margin: 3rem auto;
+	max-width: 40rem;
+	padding: 0.5rem;
+}
+
+/* Question number badge */
+.question-badge {
+	background-color: var(--ion-text-color) !important;
+	border-radius: 1rem;
+	margin: 0 auto;
+	min-width: 4rem;
+	padding: 1rem 3rem;
+	width: fit-content !important;
+	font-size: 1rem;
+}
+
+// Texture overlay
+.texture {
+	background-image: url(../../assets/texture.png);
+	background-repeat: repeat;
+	background-size: 100% 100%;
+	bottom: 0;
+	height: 100dvh;
+	isolation: isolate;
+	left: 0;
+	mix-blend-mode: multiply;
+	opacity: 0.12;
+	pointer-events: none;
+	position: fixed;
+	right: 0;
+	top: 0;
+	width: 100vw;
+	z-index: 100;
+}
+
+// Submit button section
+.submit-section {
+	margin: auto;
+	width: 100%;
+	max-width: 40rem;
+
+	ion-button {
+		--border-radius: 1rem !important;
+		--box-shadow: inset 0 -2px 6px #61633b;
+		--margin: auto;
+	}
+}
+
+// Responsive padding for question card
+@media (min-width: 640px) {
+	.question-card {
+		padding: 1.5rem;
+	}
+}
+```
+</Tab>
+<Tab value="variables.scss">
+```scss title="variables.scss"
+@import url("https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+:root {
+	--ion-font-family: "Amaranth", Arial, sans-serif;
+	--ion-background-color: #e0cdac;
+	--ion-color-primary: #979a5d;
+
+	--ion-text-color: #5a400e;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--ion-background-color: #e0cdac;
+		--ion-color-primary: #979a5d;
+
+		--ion-text-color: #5a400e;
+	}
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+### My Output
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLhwtskD6EWm1bnx6M74I3w29jDzyGCAJgkeZX"
+  alt="Output"
+  width={1920}
+  height={1080}
+/>
