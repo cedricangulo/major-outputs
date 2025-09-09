@@ -1,0 +1,335 @@
+---
+title: Laboratory 4
+---
+
+### Instructions
+
+**Project Access:** [bit.ly/python_gui-oop](https://bit.ly/python_gui-oop)
+
+#### Group Formation
+
+1. Make a group with three(3) members
+2. Download the source code by scanning QR Code
+3. Choose one (1) of the following attributes to be added in your CRUD OOP Project
+
+#### Required Attributes (Choose One)
+
+1. Email Address
+2. Home Address
+3. Date of Birth
+4. Course
+5. Phone Number
+
+### Code
+
+```python title="main.py"
+# Python Tkinter + MySQL App using OOP (Classes, Inheritance, Encapsulation, Polymorphism, Properties)
+
+import tkinter as tk
+from tkinter import messagebox, ttk
+import mysql.connector
+
+
+# -----------------------------
+# Database Layer (Encapsulation)
+# -----------------------------
+class Database:
+    def __init__(self):
+        self._connection = None
+        self._connect()
+
+    def _connect(self):
+        try:
+            self._connection = mysql.connector.connect(
+                host="localhost", user="root", password=""
+            )
+            cursor = self._connection.cursor()
+            cursor.execute("CREATE DATABASE IF NOT EXISTS python_mysql")
+            cursor.execute("USE python_mysql")
+            cursor.execute(
+                """CREATE TABLE IF NOT EXISTS tblstudentinfo (
+                studentid INT PRIMARY KEY AUTO_INCREMENT,
+                lastname VARCHAR(50),
+                firstname VARCHAR(50),
+                sex CHAR(1),
+                contactnumber VARCHAR(15),
+                email VARCHAR(100))"""
+            )
+            self._connection.commit()
+        except mysql.connector.Error as err:
+            messagebox.showerror("Database Error", str(err))
+
+    @property
+    def connection(self):
+        return self._connection
+
+    def close(self):
+        if self._connection:
+            self._connection.close()
+
+
+# -----------------------------
+# Model: Student
+# -----------------------------
+class Student:
+    def __init__(
+        self,
+        studentid=None,
+        lastname="",
+        firstname="",
+        sex="",
+        contactnumber="",
+        email="",
+    ):
+        self.studentid = studentid
+        self.lastname = lastname
+        self.firstname = firstname
+        self.sex = sex
+        self.contactnumber = contactnumber
+        self.email = email
+
+
+# -----------------------------
+# Controller: Manages student operations
+# -----------------------------
+class StudentController:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def add_student(self, student: Student):
+        if student.lastname and student.firstname and student.sex in ["M", "F"]:
+            cursor = self.db.connection.cursor()
+            query = "INSERT INTO tblstudentinfo (lastname, firstname, sex, contactnumber, email) VALUES (%s, %s, %s, %s, %s)"
+            cursor.execute(
+                query,
+                (
+                    student.lastname,
+                    student.firstname,
+                    student.sex,
+                    student.contactnumber,
+                    student.email,
+                ),
+            )
+            self.db.connection.commit()
+        else:
+            raise ValueError("Missing fields or invalid sex")
+
+    def update_student(self, student: Student):
+        if (
+            student.studentid
+            and student.lastname
+            and student.firstname
+            and student.sex in ["M", "F"]
+        ):
+            cursor = self.db.connection.cursor()
+            query = "UPDATE tblstudentinfo SET lastname=%s, firstname=%s, sex=%s, contactnumber=%s, email=%s WHERE studentid=%s"
+            cursor.execute(
+                query,
+                (
+                    student.lastname,
+                    student.firstname,
+                    student.sex,
+                    student.contactnumber,
+                    student.email,
+                    student.studentid,
+                ),
+            )
+            self.db.connection.commit()
+        else:
+            raise ValueError("Incomplete data for update")
+
+    def delete_student(self, studentid):
+        cursor = self.db.connection.cursor()
+        query = "DELETE FROM tblstudentinfo WHERE studentid = %s"
+        cursor.execute(query, (studentid,))
+        self.db.connection.commit()
+
+    def fetch_students(self, filters=None):
+        cursor = self.db.connection.cursor()
+        query = "SELECT * FROM tblstudentinfo WHERE studentid != 0"
+        params = []
+        if filters:
+            if filters.get("studentid"):
+                query += " AND studentid = %s"
+                params.append(filters["studentid"])
+            if filters.get("lastname"):
+                query += " AND lastname LIKE %s"
+                params.append(f"%{filters['lastname']}%")
+            if filters.get("firstname"):
+                query += " AND firstname LIKE %s"
+                params.append(f"%{filters['firstname']}%")
+        cursor.execute(query, tuple(params))
+        return cursor.fetchall()
+
+
+# -----------------------------
+# GUI View (Encapsulated with Tkinter)
+# -----------------------------
+class StudentApp(tk.Tk):
+    def __init__(self, controller: StudentController):
+        super().__init__()
+        self.controller = controller
+        self.title("Student Information System - OOP")
+        self.geometry("850x600")
+        self.create_widgets()
+        self.show_students()
+
+    def create_widgets(self):
+        labels = [
+            "Student ID",
+            "Last Name",
+            "First Name",
+            "Sex (M/F)",
+            "Contact Number",
+            "Email",
+        ]
+        self.entries = {}
+
+        for i, label in enumerate(labels):
+            tk.Label(self, text=label).grid(
+                row=i, column=0, padx=10, pady=5, sticky="w"
+            )
+            if label == "Sex (M/F)":
+                entry = ttk.Combobox(self, values=["M", "F"])
+            else:
+                entry = tk.Entry(self)
+            entry.grid(row=i, column=1, padx=10, pady=5)
+            self.entries[label] = entry
+
+        self.buttons = {
+            "Add": tk.Button(self, text="Add", command=self.add_student),
+            "Update": tk.Button(
+                self, text="Update", command=self.update_student, state=tk.DISABLED
+            ),
+            "Delete": tk.Button(
+                self, text="Delete", command=self.delete_student, state=tk.DISABLED
+            ),
+            "Search": tk.Button(self, text="Search", command=self.search_student),
+            "Clear": tk.Button(self, text="Clear", command=self.clear_entries),
+        }
+
+        for i, (text, btn) in enumerate(self.buttons.items(), start=5):
+            btn.grid(row=i, column=0 if i % 2 == 1 else 1, padx=10, pady=5)
+
+        columns = (
+            "Student ID",
+            "Last Name",
+            "First Name",
+            "Sex",
+            "Contact Number",
+            "Email",
+        )
+        self.tree = ttk.Treeview(self, columns=columns, show="headings")
+        for col in columns:
+            self.tree.heading(col, text=col)
+        self.tree.grid(row=10, column=0, columnspan=2, padx=10, pady=10)
+        self.tree.bind("<<TreeviewSelect>>", self.on_row_select)
+
+    def get_form_data(self):
+        return Student(
+            studentid=self.entries["Student ID"].get(),
+            lastname=self.entries["Last Name"].get(),
+            firstname=self.entries["First Name"].get(),
+            sex=self.entries["Sex (M/F)"].get().upper(),
+            contactnumber=self.entries["Contact Number"].get(),
+            email=self.entries["Email"].get(),
+        )
+
+    def add_student(self):
+        try:
+            student = self.get_form_data()
+            self.controller.add_student(student)
+            messagebox.showinfo("Success", "Student added successfully!")
+            self.show_students()
+            self.clear_entries()
+        except ValueError as ve:
+            messagebox.showerror("Input Error", str(ve))
+
+    def update_student(self):
+        try:
+            student = self.get_form_data()
+            self.controller.update_student(student)
+            messagebox.showinfo("Success", "Student updated successfully!")
+            self.show_students()
+            self.clear_entries()
+        except ValueError as ve:
+            messagebox.showerror("Update Error", str(ve))
+
+    def delete_student(self):
+        sid = self.entries["Student ID"].get()
+        if sid:
+            self.controller.delete_student(sid)
+            messagebox.showinfo("Success", "Student deleted successfully!")
+            self.show_students()
+            self.clear_entries()
+
+    def search_student(self):
+        filters = {
+            "studentid": self.entries["Student ID"].get(),
+            "lastname": self.entries["Last Name"].get(),
+            "firstname": self.entries["First Name"].get(),
+        }
+        results = self.controller.fetch_students(filters)
+        self.populate_tree(results)
+
+    def show_students(self):
+        results = self.controller.fetch_students()
+        self.populate_tree(results)
+
+    def populate_tree(self, data):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        for row in data:
+            self.tree.insert("", tk.END, values=row)
+
+    def clear_entries(self):
+        for entry in self.entries.values():
+            entry.delete(0, tk.END)
+        self.entries["Sex (M/F)"].set("")
+        self.buttons["Add"].config(state=tk.NORMAL)
+        self.buttons["Update"].config(state=tk.DISABLED)
+        self.buttons["Delete"].config(state=tk.DISABLED)
+
+    def on_row_select(self, event):
+        selected = self.tree.selection()
+        if selected:
+            values = self.tree.item(selected[0])["values"]
+            fields = [
+                "Student ID",
+                "Last Name",
+                "First Name",
+                "Sex (M/F)",
+                "Contact Number",
+                "Email",
+            ]
+            for i, val in enumerate(values):
+                self.entries[fields[i]].delete(0, tk.END)
+                self.entries[fields[i]].insert(tk.END, val)
+            self.buttons["Add"].config(state=tk.DISABLED)
+            self.buttons["Update"].config(state=tk.NORMAL)
+            self.buttons["Delete"].config(state=tk.NORMAL)
+
+
+# -----------------------------
+# Application Entry Point
+# -----------------------------
+if __name__ == "__main__":
+    db = Database()
+    controller = StudentController(db)
+    app = StudentApp(controller)
+    app.mainloop()
+    db.close()
+```
+
+### Output
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLgutWNI0MJGKADRsFezmcPy6tpIhQUHk8uSax"
+  alt="student info gui"
+  width={1529}
+  height={790}
+/>
+
+<Callout>
+  The data above is sample data
+</Callout>
