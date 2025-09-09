@@ -1,0 +1,400 @@
+---
+title: Laboratory 3
+---
+
+### Instructions
+
+**Project Access:** [bit.ly/student_py](https://bit.ly/student_py)
+
+#### Group Formation
+
+1. Make a group with three (3) members
+2. Download the Project by scanning QR Code
+3. Add the following attributes to your CRUD OOP Project
+
+#### Required Attributes
+
+1. Email Address
+2. Home Address
+3. Date of Birth
+4. Course
+5. Phone Number
+
+#### Student CRUD Console App Features
+
+```console
+🎓 Student CRUD Console App 🎓
+
+Menu:
+1. Add Student
+2. Update Student
+3. Delete Student
+4. View Student
+5. Exit
+6. Select an option (1-5): 4
+
+Search Results:
+
+ID: 1, Name: Ronaldin Ramat, Age: 29
+```
+
+### Requirements
+
+1. Python
+2. MySQL Server via XAMPP (`pip install mysql-connector-python`)
+3. Text Editor (VSCode, PyCharm, etc.)
+
+### Code
+
+<Files className="mt-4">
+  <Folder name="student_crud" defaultOpen>
+    <File name="__init__.py" />
+    <File name="database.py" />
+    <File name="operations.py" />
+    <File name="student.py" />
+  </Folder>
+  <File name="main.py" />
+</Files>
+
+<Tabs items={["main.py", "database.py", "operations.py", "student.py"]}>
+<Tab value="main.py">
+```python title="main.py" lineNumbers
+from student_crud.student import Student
+from student_crud.operations import (
+    add_student,
+    update_student,
+    delete_student,
+    search_students,
+)
+
+print("\n🎓 Student CRUD Console App 🎓")
+while True:
+    print("\nMenu:")
+    print("1. Add Student")
+    print("2. Update Student")
+    print("3. Delete Student")
+    print("4. Search Students")
+    print("5. Exit")
+
+    choice = input("Select an option (1-5): ")
+
+    if choice == "1":
+        fname = input("First Name: ")
+        lname = input("Last Name: ")
+        age = int(input("Age: "))
+        email = input("Email Address: ")
+        home_address = input("Home Address: ")
+        date_of_birth = input("Date of Birth (YYYY-MM-DD): ")
+        course = input("Course: ")
+        phone_number = input("Phone Number (11 digits): ")[:11]
+        student = Student(
+            firstname=fname,
+            lastname=lname,
+            age=age,
+            email=email,
+            home_address=home_address,
+            date_of_birth=date_of_birth,
+            course=course,
+            phone_number=phone_number,
+        )
+        add_student(student)
+
+    elif choice == "2":
+        sid = int(input("Student ID to update: "))
+        fname = input("New First Name: ")
+        lname = input("New Last Name: ")
+        age = int(input("New Age: "))
+        email = input("New Email Address: ")
+        home_address = input("New Home Address: ")
+        date_of_birth = input("New Date of Birth (YYYY-MM-DD): ")
+        course = input("New Course: ")
+        phone_number = input("New Phone Number (11 digits): ")[:11]
+        student = Student(
+            firstname=fname,
+            lastname=lname,
+            age=age,
+            email=email,
+            home_address=home_address,
+            date_of_birth=date_of_birth,
+            course=course,
+            phone_number=phone_number,
+            studentid=sid,
+        )
+        update_student(student)
+
+    elif choice == "3":
+        sid = int(input("Enter Student ID to delete: "))
+        delete_student(sid)
+
+    elif choice == "4":
+        keyword = input("Enter name to search: ")
+        results = search_students(keyword)
+        if results:
+            print("\nSearch Results:")
+            for row in results:
+                print(
+                    f"""ID: {row[0]}
+Name: {row[1]} {row[2]}
+Age: {row[3]}
+Email: {row[4]}
+Address: {row[5]}
+Date of Birth: {row[6]}
+Course: {row[7]}
+Phone: {row[8]}\n
+------------------------"""
+                )
+        else:
+            print("No matching students found.")
+
+    elif choice == "5":
+        print("👋 Exiting the program.")
+        break
+    else:
+        print("❌ Invalid option. Try again.")
+```
+</Tab>
+<Tab value="database.py">
+```python title="database.py" lineNumbers
+import mysql.connector
+
+def connect():
+  try:
+    conn = mysql.connector.connect(host="localhost", user="root", password="")
+    cursor = conn.cursor()
+    cursor.execute("CREATE DATABASE IF NOT EXISTS student_db")
+    cursor.execute("USE student_db")
+    cursor.execute(
+      """
+      CREATE TABLE IF NOT EXISTS students (
+        studentid INT AUTO_INCREMENT PRIMARY KEY,
+        firstname VARCHAR(50),
+        lastname VARCHAR(50),
+        age TINYINT,
+        email VARCHAR(100),
+        home_address TEXT,
+        date_of_birth DATE,
+        course VARCHAR(100),
+        phone_number VARCHAR(11)
+      )
+    """
+    )
+    conn.commit()
+    return conn
+except mysql.connector.Error as err:
+    print("Database error:", err)
+    return None
+```
+</Tab>
+<Tab value="operations.py">
+```python title="operations.py" lineNumbers
+from student_crud.database import connect
+from student_crud.student import Student
+
+
+def add_student(student):
+  conn = connect()
+  if conn:
+    cursor = conn.cursor()
+    query = """INSERT INTO students 
+            (firstname, lastname, age, email, home_address, date_of_birth, course, phone_number) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
+    cursor.execute(
+      query,
+      (
+        student.firstname,
+        student.lastname,
+        student.age,
+        student.email,
+        student.home_address,
+        student.date_of_birth,
+        student.course,
+        student.phone_number,
+      ),
+    )
+    conn.commit()
+    print("✅ Student added successfully!")
+    conn.close()
+
+
+def update_student(student):
+  conn = connect()
+  if conn:
+    cursor = conn.cursor()
+    query = """UPDATE students 
+            SET firstname=%s, lastname=%s, age=%s, email=%s, 
+                home_address=%s, date_of_birth=%s, course=%s, phone_number=%s 
+            WHERE studentid=%s"""
+    cursor.execute(
+      query,
+      (
+        student.firstname,
+        student.lastname,
+        student.age,
+        student.email,
+        student.home_address,
+        student.date_of_birth,
+        student.course,
+        student.phone_number,
+        student.studentid,
+      ),
+    )
+    conn.commit()
+    print("🔄 Student updated successfully!")
+    conn.close()
+
+
+def delete_student(studentid):
+  conn = connect()
+  if conn:
+    cursor = conn.cursor()
+    query = "DELETE FROM students WHERE studentid = %s"
+    cursor.execute(query, (studentid,))
+    conn.commit()
+    print("🗑️ Student deleted successfully!")
+    conn.close()
+
+
+def search_students(keyword):
+  conn = connect()
+  if conn:
+    cursor = conn.cursor()
+    query = "SELECT * FROM students WHERE firstname LIKE %s OR lastname LIKE %s"
+    wildcard = f"%{keyword}%"
+    cursor.execute(query, (wildcard, wildcard))
+    results = cursor.fetchall()
+    conn.close()
+    return results
+  return []
+```
+</Tab>
+<Tab value="student.py">
+```python title="student.py" lineNumbers
+class Student:
+  def __init__(
+    self,
+    firstname,
+    lastname,
+    age,
+    email,
+    home_address,
+    date_of_birth,
+    course,
+    phone_number,
+    studentid=None,
+  ):
+    self.studentid = studentid
+    self.firstname = firstname
+    self.lastname = lastname
+    self.age = age
+    self.email = email
+    self.home_address = home_address
+    self.date_of_birth = date_of_birth
+    self.course = course
+    self.phone_number = phone_number
+```
+</Tab>
+</Tabs>
+
+## Output
+
+```console
+🎓 Student CRUD Console App 🎓
+
+Menu:
+1. Add Student
+2. Update Student
+3. Delete Student
+4. Search Students
+5. Exit
+Select an option (1-5): 1
+First Name: Cedric
+Last Name: Angulo
+Age: 21
+Email Address: cdrcangulo@gmail.com
+Home Address: Earth
+Date of Birth (YYYY-MM-DD): 2004-11-01
+Course: BSIT
+Phone Number (11 chars max): 09511703251
+✅ Student added successfully!
+
+Menu:
+1. Add Student
+2. Update Student
+3. Delete Student
+4. Search Students
+5. Exit
+Select an option (1-5): 4
+Enter name to search: Ced
+
+Search Results:
+ID: 1
+Name: Cedric Angulo
+Age: 21
+Email: cdrcangulo@gmail.com
+Address: Earth
+Date of Birth: 2004-11-01
+Course: BSIT
+Phone: 09511703251
+
+------------------------
+
+Menu:
+1. Add Student
+2. Update Student
+3. Delete Student
+4. Search Students
+5. Exit
+Select an option (1-5): 2
+Student ID to update: 1
+New First Name: Cedric Bryan
+New Last Name: Angulo
+New Age: 21
+New Email Address: cdrcangulo@gmail.com
+New Home Address: Uranus
+New Date of Birth (YYYY-MM-DD): 2001-9-11
+New Course: BSCS
+New Phone Number (09** *** ****): 09511703251
+🔄 Student updated successfully!
+
+Menu:
+1. Add Student
+2. Update Student
+3. Delete Student
+4. Search Students
+5. Exit
+Select an option (1-5): 4
+Enter name to search: Bryan
+
+Search Results:
+ID: 1
+Name: Cedric Bryan Angulo
+Age: 21
+Email: cdrcangulo@gmail.com
+Address: Uranus
+Date of Birth: 2001-09-11
+Course: BSCS
+Phone: 09511703251
+
+------------------------
+
+Menu:
+1. Add Student
+2. Update Student
+3. Delete Student
+4. Search Students
+5. Exit
+Select an option (1-5): 3
+Enter Student ID to delete: 1
+🗑️ Student deleted successfully!
+
+Menu:
+1. Add Student
+2. Update Student
+3. Delete Student
+4. Search Students
+5. Exit
+Select an option (1-5): 5
+👋 Exiting the program.
+```
+
+👽

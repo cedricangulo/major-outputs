@@ -10,9 +10,10 @@ import {
   allItwst01s,
   allItwst02s,
 } from "content-collections"
+// fumadocs components
+import { Callout } from "fumadocs-ui/components/callout"
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock"
 import { File, Files, Folder } from "fumadocs-ui/components/files"
-// fumadocs components
 import { ImageZoom } from "fumadocs-ui/components/image-zoom"
 import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 import { Plus } from "lucide-react"
@@ -102,6 +103,7 @@ export default async function Page({ params }: PageProps) {
           code={labItem.mdx}
           components={{
             ImageContainer,
+            Callout,
             FileCard,
             File,
             Folder,
