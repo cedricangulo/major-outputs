@@ -43,6 +43,7 @@ next-env.d.ts
 # web outputs
 /.first
 /.second
+/.third
 
 # content collections
 .content-collections

@@ -1,0 +1,390 @@
+---
+title: Exercise 2
+---
+
+### Instructions
+
+**Problem Statement:**
+
+Using your creative imagination, design and build a single-page profile for your own superhero persona.
+
+Example: The name of the student is “Johnny Delos Santos.” The superhero name could be “Johnny Quick” or “Johnny Bravo.”
+
+Another example: Maria Angeles, the superhero name could be “Maria Maelstorm.” Jonathan Cojuangco could be “Super Jona” or “Jona the Whale Whisperer.”
+
+This exercise will test your ability to structure a mobile application using fundamental Ionic components:
+- ion-header
+- ion-content
+- ion-list
+- ion-footer
+
+**Your Goal:**
+
+Create an HTML file that uses the Ionic framework to present a superhero biography.
+
+Your final output should include the following:
+
+#### ion-header
+- Use this component to create the top bar of your app.
+- Set the title of the header to your superhero name or something similar.
+
+#### ion-content
+- This component will contain the main body of your superhero's biography.
+- All the profile details, including the ion-list and any introductory text, should be placed within ion-content.
+- Use this component to show your superhero biography or origin story: your birth location, birthday, your parents, tragedies, victories, etc. Explain how your hero came to be and how you got your powers.
+
+#### ion-list
+- Present the core details of your hero in a structured way.
+- Inside the list, include at least two ion-item components, each with an ion-label.
+- These items must contain the following information:
+	- Superhero Name: Invent a unique name for your hero.
+	- Powers & Abilities: Describe at least two of your hero's special powers.
+
+#### ion-footer
+- Use this component to create a bottom bar for your app.
+- The footer should include a simple text message, such as "Created by [Your Name]" or a short, inspiring quote from your superhero.
+- Also include a fictitious email for your superhero name.
+
+---
+
+### Code
+
+<Files className="mt-4">
+  <Folder name="exercise1" defaultOpen>
+    <Folder name="node_modules" disabled />
+    <Folder name="src" defaultOpen>
+      <Folder name="app" defaultOpen>
+        <Folder name="home" defaultOpen>
+          <File name="home.page.html" />
+          <File name="home.page.scss" />
+        </Folder>
+      </Folder>
+      <Folder name="themes" defaultOpen>
+        <File name="variables.scss" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+<Tabs items={["home.page.html", "home.page.scss", "variables.scss"]}>
+<Tab value="home.page.html">
+```html title="home.page.html"
+<!-- Main header bar displaying the superhero name -->
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>
+      Iron Sentinel - Guardian of Technology
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Collapsible header inside content for mobile view -->
+  <ion-header collapse="condense">
+    <ion-toolbar color="primary">
+      <ion-title size="large">Iron Sentinel</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Main container for the hero profile -->
+  <div class="hero-profile">
+    <!-- Hero image display -->
+    <img src="assets/ironsentinel.png" alt="Iron Sentinel Hero Image" class="hero-image">
+
+    <!-- Hero Biography -->
+    <!-- Section detailing the origin story of the superhero -->
+    <h2>Origin Story</h2>
+    <p>
+      My real name is Marcus Chen, born March 15, 1995, in Singapore. My parents, Dr. Elena Chen and Professor David Chen, were scientists developing nanotechnology for medical use. At 16, I lost them in a lab explosion during an experiment with self-repairing nanobots, which bonded with my DNA.
+    </p>
+    <p>
+      Initially thinking I was dying, I discovered the nanobots granted me abilities to control technology, manipulate metal, and self-repair. My greatest victory was stopping a cyber-terrorist attack on global financial systems. Now, I protect both worlds, fulfilling my parents' dream of using technology to heal.
+    </p>
+
+    <!-- Hero Details List -->
+    <!-- Structured list of hero profile details -->
+    <h2>Hero Profile</h2>
+    <ion-list>
+      <!-- Real name item -->
+      <ion-item>
+        <ion-icon name="person" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <h3>Real Name</h3>
+          <p>Marcus Chen</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Superhero name item -->
+      <ion-item>
+        <ion-icon name="hardware-chip" slot="start" color="secondary"></ion-icon>
+        <ion-label>
+          <h3>Superhero Name</h3>
+          <p>Iron Sentinel - Guardian of Technology</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Powers and abilities item -->
+      <ion-item>
+        <ion-icon name="flash" slot="start" color="success"></ion-icon>
+        <ion-label>
+          <h3>Powers & Abilities</h3>
+          <p>• Technopathy: Can interface and control any electronic device with his mind</p>
+          <p>• Ferrokinesis: Ability to manipulate and control all forms of metal</p>
+          <p>• Nanobiotic Healing: Self-repair using available metals and electronics</p>
+          <p>• Digital Integration: Can merge consciousness with computer systems</p>
+          <p>• Electromagnetic Pulse: Can generate controlled EMPs to disable technology</p>
+          <p>• Cybernetic Enhancement: Enhanced strength, speed, and reflexes through nanobots</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Birth location item -->
+      <ion-item>
+        <ion-icon name="location" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h3>Birth Location</h3>
+          <p>Singapore, Southeast Asia</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Birthday item -->
+      <ion-item>
+        <ion-icon name="calendar" slot="start" color="medium"></ion-icon>
+        <ion-label>
+          <h3>Birthday</h3>
+          <p>March 15, 1995</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Parents item -->
+      <ion-item>
+        <ion-icon name="people" slot="start" color="warning"></ion-icon>
+        <ion-label>
+          <h3>Parents</h3>
+          <p>Dr. Elena Chen (Nanotechnology Researcher) - Deceased</p>
+          <p>Professor David Chen (Biomedical Engineer) - Deceased</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Greatest tragedy item -->
+      <ion-item>
+        <ion-icon name="heart-broken" slot="start" color="danger"></ion-icon>
+        <ion-label>
+          <h3>Greatest Tragedy</h3>
+          <p>Lost both parents in a laboratory explosion while trying to save them,
+            which ironically gave him his powers through experimental nanobots</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Greatest victory item -->
+      <ion-item>
+        <ion-icon name="trophy" slot="start" color="warning"></ion-icon>
+        <ion-label>
+          <h3>Greatest Victory</h3>
+          <p>Prevented a global cyber-terrorist attack that would have collapsed
+            the world's financial and communication systems, saving millions</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Mission item -->
+      <ion-item>
+        <ion-icon name="shield" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <h3>Mission</h3>
+          <p>Protecting both digital and physical worlds, ensuring technology serves
+            humanity and continues his parents' legacy of using science to heal</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Hero Stats -->
+    <!-- Visual stats section using progress bars -->
+    <h2>Hero Profile</h2>
+    <ion-grid>
+      <!-- First row of stats -->
+      <ion-row>
+        <ion-col size="6">
+          <div class="stat-item">
+            <h3>🔧 Technology Control</h3>
+            <ion-progress-bar value="1.0" color="primary"></ion-progress-bar>
+            <p>100%</p>
+          </div>
+        </ion-col>
+        <ion-col size="6">
+          <div class="stat-item">
+            <h3>🧠 Intelligence</h3>
+            <ion-progress-bar value="0.95" color="secondary"></ion-progress-bar>
+            <p>95%</p>
+          </div>
+        </ion-col>
+      </ion-row>
+      <!-- Second row of stats -->
+      <ion-row>
+        <ion-col size="6">
+          <div class="stat-item">
+            <h3>⚡ Metal Manipulation</h3>
+            <ion-progress-bar value="0.90" color="success"></ion-progress-bar>
+            <p>90%</p>
+          </div>
+        </ion-col>
+        <ion-col size="6">
+          <div class="stat-item">
+            <h3>�️ Defense Systems</h3>
+            <ion-progress-bar value="0.85" color="tertiary"></ion-progress-bar>
+            <p>85%</p>
+          </div>
+        </ion-col>
+      </ion-row>
+      <!-- Third row of stats -->
+      <ion-row>
+        <ion-col size="6">
+          <div class="stat-item">
+            <h3>💻 Hacking Skills</h3>
+            <ion-progress-bar value="1.0" color="warning"></ion-progress-bar>
+            <p>100%</p>
+          </div>
+        </ion-col>
+        <ion-col size="6">
+          <div class="stat-item">
+            <h3>⚡ Nanobiotic Healing</h3>
+            <ion-progress-bar value="0.80" color="danger"></ion-progress-bar>
+            <p>80%</p>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Fun Facts -->
+    <!-- Additional fun facts about the hero -->
+    <h2>Fun Facts</h2>
+    <ion-list class="fun-facts-list">
+      <!-- Fun fact item 1 -->
+      <ion-item>
+        <ion-icon name="star" slot="start" color="warning"></ion-icon>
+        <ion-label>
+          Can communicate with any electronic device, including talking to his refrigerator about food spoilage
+        </ion-label>
+      </ion-item>
+      <!-- Fun fact item 2 -->
+      <ion-item>
+        <ion-icon name="language" slot="start" color="success"></ion-icon>
+        <ion-label>
+          Multilingual in programming languages: Speaks Python, JavaScript, C++, and Assembly fluently
+        </ion-label>
+      </ion-item>
+      <!-- Fun fact item 3 -->
+      <ion-item>
+        <ion-icon name="cafe" slot="start" color="tertiary"></ion-icon>
+        <ion-label>His favorite hobby is debugging code while meditating - he calls it "digital zen"</ion-label>
+      </ion-item>
+      <!-- Fun fact item 4 -->
+      <ion-item>
+        <ion-icon name="heart-dislike-outline" slot="start" color="danger"></ion-icon>
+        <ion-label>Despite his technological prowess, he still struggles with smartphone autocorrect</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+
+<!-- Footer with contact and creator information -->
+<ion-footer>
+  <ion-toolbar>
+    <ion-title class="footer-content">
+      <p>📧 Contact: iron.sentinel@techguardian.net</p>
+      <p>Created by Charles and Cedric</p>
+    </ion-title>
+  </ion-toolbar>
+</ion-footer>
+```
+</Tab>
+<Tab value="home.page.scss">
+```scss title="home.page.scss"
+/* Main layout container for the page */
+.main {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+/* Heading styles for sections like Origin Story, Hero Profile, Fun Facts */
+h2 {
+  margin-top: 2rem;
+}
+
+/* Paragraph text styling used in biography and list descriptions */
+p {
+  color: #666;
+}
+
+// Hero Profile Styling
+/* Main container for the hero profile section */
+.hero-profile {
+  padding: 16px;
+}
+
+/* Individual stat item styling in the hero stats grid */
+.stat-item {
+  text-align: center;
+  padding: 8px;
+
+  h3 {
+    font-size: 0.9em;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    margin: 8px 0 0 0;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+
+  ion-progress-bar {
+    margin: 4px 0;
+  }
+}
+
+/* Fun facts list styling */
+.fun-facts-list {
+  ion-label {
+    color: #666;
+  }
+}
+
+/* Footer content styling for contact and creator info */
+.footer-content {
+  text-align: center;
+  font-size: 14px;
+
+  div {
+    p {
+      margin: 4px 0;
+
+      &:first-child {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+```
+</Tab>
+<Tab value="variables.scss">
+```scss title="variables.scss"
+:root {
+  --ion-color-primary: #2d2d2d;
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+### Output
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLpLJhvtS2CB4Uqd0Qm58wG91yTMnftHAVcKYo"
+  alt="Exercise 1 Output"
+  width={3600}
+  height={2025}
+/>
+
+<span>rush eh</span>

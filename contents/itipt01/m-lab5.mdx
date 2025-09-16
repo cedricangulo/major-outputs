@@ -1,0 +1,708 @@
+---
+title: Laboratory 5
+---
+
+### Instructions
+
+1. Download the `api-client-with-auth.html` from [https://bit.ly/secured-web-api](https://bit.ly/secured-web-api).
+2. Set the base URL into `http://119.93.173.77:81/data_integration/api-xml-sercured.php`.
+3. Add contactnumber, fblink, and iglink in the list of fields to be fetched. These fields are already configured in the API production server.
+4. Make sure that the newly added fields are included in the CRUD processes.
+
+---
+
+### Steps Taken
+
+1. Downloaded the `api-client-with-auth.html` file from the provided link.
+2. Opened the file in VSCode, base URL was already set to the required URL.
+3. Added the new fields `contactnumber`, `fblink`, and `iglink` in the relevant sections of the code to ensure they are fetched from the API.
+4. Updated the fields variable below the html file where the JavaScript is written.
+5. Tested the CRUD operations to ensure the new fields are included and functioning correctly.
+6. Fixed the table display issue by adding `overflow-x: scroll;`.
+
+---
+
+### Code
+
+<Tabs items={["api-client-with-auth.html", "api-xml-secured.php"]}>
+<Tab value="api-client-with-auth.html">
+```html title="api-client-with-auth.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Records Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 75%;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+        }
+        .form-section, .display-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .form-row input, .form-row select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn.primary { background-color: #007bff; }
+        .btn.primary:hover { background-color: #0056b3; }
+        .btn.success { background-color: #28a745; }
+        .btn.success:hover { background-color: #218838; }
+        .btn.info { background-color: #17a2b8; }
+        .btn.info:hover { background-color: #138496; }
+        .btn.danger { background-color: #dc3545; }
+        .btn.danger:hover { background-color: #c82333; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .message.success { background-color: #d4edda; color: #155724; }
+        .message.error { background-color: #f8d7da; color: #721c24; }
+        
+        /* Added for clickable rows */
+        .student-row {
+            cursor: pointer;
+        }
+        .student-row:hover {
+            background-color: #e9e9e9;
+        }
+
+        /* === Responsive Styles === */
+        @media (max-width: 768px) {
+            .container {
+                width: auto;
+                padding: 10px;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .form-row input, 
+            .form-row select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            /* Table responsiveness */
+            table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+            thead {
+                display: none;
+            }
+            tr {
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+                display: block;
+            }
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 45%;
+                padding-left: 15px;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Student Records Management</h1>
+
+    <div class="form-section">
+        <h2>Student Information Form</h2>
+        <div class="form-row">
+            <input type="text" id="studentnumber" placeholder="Student Number">
+            <input type="text" id="lastname" placeholder="Last Name">
+            <input type="text" id="firstname" placeholder="First Name">
+            <input type="text" id="middlename" placeholder="Middle Name">
+        </div>
+        <div class="form-row">
+            <select id="sex">
+                <option value="">Select Sex</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            <input type="text" id="dateofbirth" placeholder="Date of Birth (YYYY-MM-DD)">
+            <input type="text" id="course" placeholder="Course">
+            <input type="text" id="emailaddress" placeholder="Email Address">
+        </div>
+        <div class="form-row">
+            <input type="text" id="contactnumber" placeholder="Contact Number">
+            <input type="text" id="fblink" placeholder="Facebook Link">
+            <input type="text" id="iglink" placeholder="Instagram Link">
+        </div>
+
+        <div class="btn-group">
+            <button id="addBtn" class="btn success">Add Student</button>
+            <button id="updateBtn" class="btn info">Update Student</button>
+            <button id="deleteBtn" class="btn danger">Delete Student</button>
+        </div>
+    </div>
+    
+    <div class="form-section">
+        <h2>Search & Display</h2>
+        <div class="form-row">
+            <input type="text" id="search-keyword" placeholder="Search by Student No., Name, or Course">
+            <button id="searchBtn" class="btn primary">Search</button>
+            <button id="allBtn" class="btn primary">Display All</button>
+        </div>
+    </div>
+
+    <div id="message-area" class="message" style="display:none;"></div>
+
+    <div class="display-section">
+        <h2>Student Records</h2>
+        <div id="table-container" style="overflow-x: scroll;">
+            <p>Use the buttons above to fetch student data.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = "http://119.93.173.77:81/data_integration/api-xml-secured.php";
+    const API_USER = 'apiuser';
+    const API_PASS = 'stR0n6P@55w0rd';
+
+    // Revised to include only the specified fields
+    const fields = [
+        'studentnumber', 'lastname', 'firstname', 'middlename',
+        'sex', 'dateofbirth', 'course', 'emailaddress',
+        'contactnumber', 'fblink', 'iglink'
+    ];
+
+    const messageArea = document.getElementById('message-area');
+    const tableContainer = document.getElementById('table-container');
+
+    let currentStudentsData = []; 
+
+    function showMessage(message, type) {
+        messageArea.textContent = message;
+        messageArea.className = `message ${type}`;
+        messageArea.style.display = 'block';
+    }
+
+    function hideMessage() {
+        messageArea.style.display = 'none';
+    }
+
+    function populateForm(studentData) {
+        fields.forEach(field => {
+            const inputElement = document.getElementById(field);
+            if (inputElement) {
+                inputElement.value = studentData[field] || '';
+            }
+        });
+        showMessage('Form populated. Ready for Update or Delete.', 'info');
+    }
+
+    function createTable(data) {
+        if (!data || data.length === 0) {
+            return "<p>No records found.</p>";
+        }
+
+        let tableHtml = "<table><thead><tr>";
+        const headers = Object.keys(data[0]);
+        headers.forEach(header => {
+            tableHtml += `<th>${header.replace('_', ' ')}</th>`;
+        });
+        tableHtml += "</tr></thead><tbody>";
+
+        data.forEach(row => {
+            tableHtml += `<tr class="student-row" data-student-number="${row.studentnumber}">`;
+            headers.forEach(header => {
+                tableHtml += `<td data-label="${header.replace('_', ' ')}">${row[header] || ''}</td>`;
+            });
+            tableHtml += "</tr>";
+        });
+
+        tableHtml += "</tbody></table>";
+        return tableHtml;
+    }
+
+    function getFormData() {
+        const formData = new FormData();
+        fields.forEach(field => {
+            const input = document.getElementById(field);
+            if (input && input.value) {
+                formData.append(field, input.value);
+            }
+        });
+        return formData;
+    }
+
+    async function apiCall(endpoint, data = null) {
+        hideMessage();
+        const url = `${BASE_URL}?${endpoint}`;
+        
+        const credentials = `${API_USER}:${API_PASS}`;
+        const encodedCredentials = btoa(credentials);
+        
+        const options = {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Authorization': `Basic ${encodedCredentials}`
+            }
+        };
+
+        try {
+            const response = await fetch(url, options);
+            const responseText = await response.text();
+
+            if (response.status === 401) {
+                showMessage('Authentication failed. Check your API username and password.', 'error');
+                return;
+            }
+
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(responseText, "text/xml");
+
+            const parseError = xmlDoc.querySelector('parsererror');
+            if (parseError) {
+                console.error("XML Parsing Error:", parseError.textContent);
+                showMessage(`Error parsing server response: ${parseError.textContent}. Raw response: ${responseText.substring(0, 100)}...`, 'error');
+                return;
+            }
+
+            const responseMessageNode = xmlDoc.querySelector('response message');
+            if (responseMessageNode) {
+                if (response.ok) {
+                    showMessage(responseMessageNode.textContent, 'success');
+                } else {
+                    showMessage(responseMessageNode.textContent, 'error');
+                }
+                tableContainer.innerHTML = "<p>Operation completed.</p>";
+                return;
+            }
+
+            const nestedErrorMessageNode = xmlDoc.querySelector('response error message');
+            if (nestedErrorMessageNode) {
+                showMessage(nestedErrorMessageNode.textContent, 'error');
+                tableContainer.innerHTML = "<p>Operation failed.</p>";
+                return;
+            }
+
+            const directErrorMessageNode = xmlDoc.querySelector('error message');
+            if (directErrorMessageNode) {
+                 showMessage(directErrorMessageNode.textContent, 'error');
+                 tableContainer.innerHTML = "<p>Operation failed.</p>";
+                 return;
+            }
+
+            const studentItems = xmlDoc.querySelectorAll('students item');
+            if (studentItems.length > 0) {
+                const students = [];
+                studentItems.forEach(node => {
+                    const student = {};
+                    for (const child of node.children) {
+                        student[child.tagName] = child.textContent;
+                    }
+                    students.push(student);
+                });
+                currentStudentsData = students;
+                tableContainer.innerHTML = createTable(students);
+                showMessage('Data fetched successfully!', 'success');
+                return;
+            }
+            
+            if (response.ok) {
+                tableContainer.innerHTML = "<p>No records or specific message found.</p>";
+                showMessage('Operation completed with no specific data/message.', 'info');
+            } else {
+                showMessage(`API returned an unexpected error format. Status: ${response.status}. Raw: ${responseText.substring(0, 100)}...`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Fetch operation failed:', error);
+            showMessage('Network error or an unexpected issue occurred. Check console for details.', 'error');
+        }
+    }
+	
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('addBtn').addEventListener('click', () => {
+            const data = getFormData();
+            if (data.get('studentnumber')) {
+                apiCall('add', data);
+            } else {
+                showMessage('Student number is required to add.', 'error');
+            }
+        });
+
+        document.getElementById('updateBtn').addEventListener('click', () => {
+            const data = getFormData();
+            if (data.get('studentnumber')) {
+                apiCall('update', data);
+            } else {
+                showMessage('Student number is required to update.', 'error');
+            }
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            const studentnumber = document.getElementById('studentnumber').value;
+            if (studentnumber) {
+                const data = new FormData();
+                data.append('studentnumber', studentnumber);
+                apiCall('delete', data);
+            } else {
+                showMessage('Student number is required to delete.', 'error');
+            }
+        });
+
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const keyword = document.getElementById('search-keyword').value;
+            const data = new FormData();
+            data.append('search', keyword);
+            data.append('fields', fields.join(','));
+            apiCall('search', data);
+        });
+
+        document.getElementById('allBtn').addEventListener('click', () => {
+            const data = new FormData();
+            data.append('fields', fields.join(','));
+            apiCall('all', data);
+        });
+
+        tableContainer.addEventListener('click', (event) => {
+            const clickedRow = event.target.closest('tr.student-row');
+            
+            if (clickedRow) {
+                const studentNumber = clickedRow.dataset.studentNumber;
+                
+                const selectedStudent = currentStudentsData.find(
+                    student => student.studentnumber === studentNumber
+                );
+
+                if (selectedStudent) {
+                    populateForm(selectedStudent);
+                } else {
+                    console.warn(`Could not find student with number: ${studentNumber}`);
+                    showMessage('Selected student data not found in cache.', 'error');
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+```
+</Tab>
+<Tab value="api-xml-secured.php">
+```php title="api-xml-secured.php"
+<?php
+
+// ---------- CORS & content headers ----------
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Authorization, Content-Type");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header('Content-Type: application/xml; charset=utf-8');
+
+// Short-circuit CORS preflight
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+// ---------- BASIC AUTH (sample credentials) ----------
+$API_USER = 'apiuser';           // TODO: change for your deployment
+$API_PASS = 'stR0n6P@55w0rd';  	 // TODO: store securely (env/secret store)
+
+// Helper to emit an XML error and stop
+function auth_xml_error($msg = 'Unauthorized') {
+    header('HTTP/1.1 401 Unauthorized');
+    header('WWW-Authenticate: Basic realm="StudentAPI"');
+    $xml = new SimpleXMLElement('<response/>');
+    $err = $xml->addChild('error');
+    $err->addChild('message', $msg);
+    echo $xml->asXML();
+    exit;
+}
+
+// Extract Basic credentials (works across Apache/FastCGI variants)
+$authUser = null;
+$authPass = null;
+
+if (isset($_SERVER['PHP_AUTH_USER'])) {
+    $authUser = $_SERVER['PHP_AUTH_USER'];
+    $authPass = $_SERVER['PHP_AUTH_PW'] ?? '';
+} elseif (isset($_SERVER['HTTP_AUTHORIZATION']) && stripos($_SERVER['HTTP_AUTHORIZATION'], 'basic ') === 0) {
+    $decoded = base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6));
+    if ($decoded !== false && strpos($decoded, ':') !== false) {
+        list($authUser, $authPass) = explode(':', $decoded, 2);
+    }
+}
+
+// Validate credentials
+if (!is_string($authUser) || !is_string($authPass)
+    || !hash_equals($API_USER, $authUser)
+    || !hash_equals($API_PASS, $authPass)) {
+    auth_xml_error('Unauthorized or missing credentials.');
+}
+
+
+$host = 'localhost';
+$dbname = 'data_integration';
+$username = 'acad123';
+$password = 'aC@d_purpos3s';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    // Create a root element for errors
+    $xml = new SimpleXMLElement('<response/>');
+    $error = $xml->addChild('error');
+    $error->addChild('message', 'Database connection failed: ' . $e->getMessage());
+    echo $xml->asXML();
+    exit;
+}
+
+// Define all valid columns
+$validFields = [
+    'studentnumber', 'lastname', 'firstname', 'middlename',
+    'sex', 'dateofbirth', 'course', 'emailaddress',
+    'contactnumber', 'fblink', 'iglink', 'hobbies_interest'
+];
+
+/**
+ * Helper function to create an XML response for messages or data.
+ * @param array|string $data The data to convert to XML.
+ * @param string $root_name The name of the root XML element.
+ * @return string The XML string.
+ */
+function createXmlResponse($data, $root_name = 'response') {
+    $xml = new SimpleXMLElement("<?xml version=\"1.0\"?><$root_name></$root_name>");
+
+    if (is_array($data)) {
+        arrayToXml($data, $xml);
+    } elseif (is_string($data)) {
+        $xml->addChild('message', $data);
+    }
+
+    return $xml->asXML();
+}
+/**
+ * Recursive helper to convert an associative array to SimpleXMLElement.
+ * @param array $array The input array.
+ * @param SimpleXMLElement $xml The parent XML element.
+ */
+function arrayToXml($array, &$xml) {
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            if (!is_numeric($key)) {
+                $subnode = $xml->addChild("$key");
+                arrayToXml($value, $subnode);
+            } else {
+                $subnode = $xml->addChild("item");
+                arrayToXml($value, $subnode);
+            }
+        } else {
+            $xml->addChild("$key", htmlspecialchars("$value"));
+        }
+    }
+}
+
+// Helper: get posted fields or default to *
+function getFieldSelection($validFields) {
+    if (isset($_POST['fields'])) {
+        $requested = explode(',', $_POST['fields']);
+        $cleaned = array_intersect($requested, $validFields);
+        return implode(',', $cleaned);
+    }
+    return '*'; // fallback if not specified
+}
+
+// === ADD Student ===
+if (isset($_GET['add'])) {
+    $columns = [];
+    $values = [];
+    $placeholders = [];
+
+    foreach ($validFields as $field) {
+        if (isset($_POST[$field])) {
+            $columns[] = $field;
+            $values[$field] = $_POST[$field];
+            $placeholders[] = ':' . $field;
+        }
+    }
+
+    if (count($columns) > 0) {
+        $sql = "INSERT INTO tblstudentinfo (" . implode(',', $columns) 
+		       . ") VALUES (" . implode(',', $placeholders) . ")";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($values);
+        echo createXmlResponse('Student added successfully.');
+    } else {
+        echo createXmlResponse('No data received.', 'error');
+    }
+    exit;
+}
+
+// === UPDATE Student ===
+if (isset($_GET['update'])) {
+    if (!isset($_POST['studentnumber'])) {
+        echo createXmlResponse('Student number required.', 'error');
+        exit;
+    }
+
+    $updates = [];
+    $values = [];
+    foreach ($validFields as $field) {
+        if ($field !== 'studentnumber' && isset($_POST[$field])) {
+            $updates[] = "$field = :$field";
+            $values[$field] = $_POST[$field];
+        }
+    }
+    $values['studentnumber'] = $_POST['studentnumber'];
+
+    if (count($updates) > 0) {
+        $sql = "UPDATE tblstudentinfo SET " . implode(',', $updates) . " WHERE studentnumber = :studentnumber";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($values);
+        echo createXmlResponse('Student updated successfully.');
+    } else {
+        echo createXmlResponse('No update data provided.', 'error');
+    }
+    exit;
+}
+
+// === SEARCH Student ===
+if (isset($_GET['search'])) {
+    $search = $_POST['search'] ?? '';
+    $fields = getFieldSelection($validFields);
+    $sql = "SELECT $fields FROM tblstudentinfo WHERE 
+                studentnumber LIKE :s OR 
+                lastname LIKE :s OR 
+                firstname LIKE :s OR 
+                course LIKE :s OR 
+                emailaddress LIKE :s";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['s' => "%$search%"]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo createXmlResponse($results, 'students');
+    exit;
+}
+
+// === DELETE Student ===
+if (isset($_GET['delete'])) {
+    if (!isset($_POST['studentnumber'])) {
+        echo createXmlResponse('Student number required.', 'error');
+        exit;
+    }
+    $stmt = $pdo->prepare("DELETE FROM tblstudentinfo WHERE studentnumber = :studentnumber");
+    $stmt->execute(['studentnumber' => $_POST['studentnumber']]);
+    echo createXmlResponse('Student deleted successfully.');
+    exit;
+}
+
+// === GET ALL Students ===
+if (isset($_GET['all'])) {
+    $fields = getFieldSelection($validFields);
+    $stmt = $pdo->query("SELECT $fields FROM tblstudentinfo");
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo createXmlResponse($results, 'students');
+    exit;
+}
+
+// === Default ===
+echo createXmlResponse('Invalid request.', 'error');
+exit;
+
+?>
+```
+</Tab>
+</Tabs>
+
+---
+
+### Output
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLFK0Bkqr36jENntLyueCGq0pkTvz2KJ8mVsBg"
+  width={1600}
+  height={1040}
+  alt="Screenshot of the Student Records Management web application"
+/>
+
+<Callout>
+  Other students insert the table data.
+</Callout>
