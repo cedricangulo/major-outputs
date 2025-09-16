@@ -1,0 +1,141 @@
+---
+title: Laboratory 6
+---
+
+### Instructions
+
+1. Open Jupyter Notebook and Create new Notebook Project
+2. Input Cell 1 **pip install pandas**
+3. Copy the source code from [this link](https://bit.ly/WebAPI-Jupyter) and paste it into Cell 2 of Jupyter Notebook Project
+4. Input Cell 3 **main()**
+5. Run Cell 1 and 2
+6. Run Cell 3 and Test All CRUD Functionalities. After Testing, Press 6 to Exit.
+7. Complete all attributes(contactnumber, fblink, iglink, hobbies_interest) in your Jupyter Notebook Project in Cell 2
+8. Format the Date of Birth in the DataFrame
+  - `df['dateofbirth'] = pd.to_datetime(df['dateofbirth']).dt.strftime('%d-%m-%Y')`
+9. Run Cell 2 and 3 Again
+10. Verify the Result by testing ALL CRUD Functionalities.
+
+---
+
+### Code
+
+```python title="Web API with Jupyter Notebook"
+import requests
+import pandas as pd
+from IPython.display import display, clear_output
+
+BASE_URL = "http://119.93.173.77:81/oes/data_integration/"
+
+# Fields for all operations
+FIELDS = [
+    'studentnumber', 'lastname', 'firstname', 'middlename',
+    'sex', 'dateofbirth', 'course', 'emailaddress',
+    'contactnumber', 'fblink', 'iglink', 'hobbies_interest'
+]
+
+def print_menu():
+    print("\n=== Student CRUD Menu ===")
+    print("1. Add Student")
+    print("2. Update Student")
+    print("3. Search Student")
+    print("4. Display All Students")
+    print("5. Delete Student")
+    print("6. Exit")
+
+def add_student():
+    data = {field: input(f"Enter {field.replace('_', ' ').title()}: ") for field in FIELDS}
+    response = requests.post(BASE_URL + "?add", data=data)
+    print("Status:", response.status_code)
+    print("Response:", response.text)
+
+def update_student():
+    studentnumber = input("Enter Student Number to Update: ")
+    data = {field: input(f"Enter new {field.replace('_', ' ').title()} (leave blank to skip): ")
+            for field in FIELDS if field != "studentnumber"}
+    data = {k: v for k, v in data.items() if v.strip() != ""}
+    data["studentnumber"] = studentnumber
+    response = requests.post(BASE_URL + "?update", data=data)
+    print("Status:", response.status_code)
+    print("Response:", response.text)
+
+def display_table(records):
+    if not records:
+        print("No records found.")
+        return
+
+    df = pd.DataFrame(records)
+    cols = [col for col in FIELDS if col in df.columns]
+    df = df[cols]
+    if 'dateofbirth' in df.columns:
+        # coerce invalid dates to NaT, then format as 'Nov 08, 1985'
+        df['dateofbirth'] = pd.to_datetime(df['dateofbirth'], errors='coerce').dt.strftime('%b %d, %Y')
+
+    display(df)
+
+def search_student():
+    keyword = input("Enter search keyword: ")
+    data = {
+        "search": keyword,
+        "fields": ",".join(FIELDS)
+    }
+    response = requests.post(BASE_URL + "?search", data=data)
+    if response.ok:
+        results = response.json()
+        display_table(results)
+    else:
+        print("Search failed. Status:", response.status_code)
+
+def display_all():
+    data = {"fields": ",".join(FIELDS)}
+    response = requests.post(BASE_URL + "?all", data=data)
+    if response.ok:
+        students = response.json()
+        display_table(students)
+    else:
+        print("Failed to retrieve students. Status:", response.status_code)
+
+def delete_student():
+    studentnumber = input("Enter Student Number to Delete: ")
+    response = requests.post(BASE_URL + "?delete", data={"studentnumber": studentnumber})
+    print("Status:", response.status_code)
+    print("Response:", response.text)
+
+def main():
+    while True:
+        print_menu()
+        choice = input("Choose option (1–6): ").strip()
+        clear_output(wait=True)
+
+        if choice == '1':
+            add_student()
+        elif choice == '2':
+            update_student()
+        elif choice == '3':
+            search_student()
+        elif choice == '4':
+            display_all()
+        elif choice == '5':
+            delete_student()
+        elif choice == '6':
+            print("Exiting program.")
+            break
+        else:
+            print("Invalid option. Try again.")
+
+```
+
+---
+
+### Output
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLp71t9RS2CB4Uqd0Qm58wG91yTMnftHAVcKYo"
+  width={1600}
+  height={1040}
+  alt="Screenshot of the Jupyter Notebook output"
+/>
+
+<Callout>
+  Other students insert the table data.
+</Callout>

@@ -1,0 +1,403 @@
+---
+title: Exercise 1
+---
+
+### Instructions
+
+**Problem Statement:**
+
+You will create a front-end application for a mobile-first NEUSTea Station in a university setting. The app lets customers build a custom milk tea order by selecting from a menu of 20 add-ons and toppings.
+
+**Your Goal:**
+
+Use HTML and CSS to make a single webpage that meets these requirements.
+
+1. Layout:
+  - The page must have a clean, user-friendly layout styled with Ionic components.
+  - Include a header with the title "The Milk Tea Bar."
+  - Display a base price for a standard milk tea.
+
+2. Toggle Components:
+  - Create a list of 20 add-ons and toppings.
+  - Each item in the list must have an ion-toggle component that the user can switch on or off.
+  - Each ion-toggle should be paired with a label showing the add-on name and its price.
+
+The 20 Items for this Tea Bar:
+
+1. Pearls (Boba) - ₱10
+2. Nata de Coco - ₱10
+3. Pudding - ₱15
+4. Coffee Jelly - ₱15
+5. Grass Jelly - ₱15
+6. Cheese Foam - ₱20
+7. Rock Salt & Cheese - ₱20
+8. Oreo Crumbs - ₱15
+9. Crystal Boba - ₱10
+10. Chia Seeds - ₱10
+11. Aloe Vera - ₱15
+12. Konjac Jelly - ₱15
+13. Assorted Fruits - ₱20
+14. Extra Shot of Espresso - ₱25
+15. Matcha Powder - ₱20
+16. Cereal Crunch - ₱20
+17. Whipped Cream - ₱15
+18. Brown Sugar Syrup - ₱10
+19. Caramel Sauce - ₱10
+20. Taro Bits - ₱15
+
+---
+
+### Code
+
+<Files className="mt-4">
+  <Folder name="exercise1" defaultOpen>
+    <Folder name="node_modules" disabled />
+    <Folder name="src" defaultOpen>
+      <Folder name="app" defaultOpen>
+        <Folder name="home" defaultOpen>
+          <File name="home.page.html" />
+          <File name="home.page.scss" />
+        </Folder>
+      </Folder>
+      <Folder name="themes" defaultOpen>
+        <File name="variables.scss" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+<Tabs items={["home.page.html", "home.page.scss", "variables.scss"]}>
+<Tab value="home.page.html">
+```html title="home.page.html"
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      The Milk Tea Bar
+    </ion-title>
+    <p>Customize your perfect milk tea</p>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-row class="header">
+      <ion-col size="12">
+        <ion-card class="header-card">
+          <ion-card-header>
+            <ion-card-title>The Milk Tea Bar</ion-card-title>
+            <ion-card-subtitle>Base price (standard milk tea)</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <h2>₱59.00</h2>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="add-ons">
+      <ion-col size="12">
+        <ion-list>
+          <ion-list-header>
+            <ion-label>Add-ons & Toppings</ion-label>
+          </ion-list-header>
+
+          <!-- 1 -->
+          <ion-item lines="none">
+            <ion-label>Pearls (Boba) <div class="price">₱10</div></ion-label>
+            <ion-toggle slot="end" data-price="10"></ion-toggle>
+          </ion-item>
+
+          <!-- 2 -->
+          <ion-item lines="none">
+            <ion-label>Nata de Coco <div class="price">₱10</div></ion-label>
+            <ion-toggle slot="end" data-price="10"></ion-toggle>
+          </ion-item>
+
+          <!-- 3 -->
+          <ion-item lines="none">
+            <ion-label>Pudding <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+          <!-- 4 -->
+          <ion-item lines="none">
+            <ion-label>Coffee Jelly <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+          <!-- 5 -->
+          <ion-item lines="none">
+            <ion-label>Grass Jelly <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+          <!-- 6 -->
+          <ion-item lines="none">
+            <ion-label>Cheese Foam <div class="price">₱20</div></ion-label>
+            <ion-toggle slot="end" data-price="20"></ion-toggle>
+          </ion-item>
+
+          <!-- 7 -->
+          <ion-item lines="none">
+            <ion-label>Rock Salt & Cheese <div class="price">₱20</div></ion-label>
+            <ion-toggle slot="end" data-price="20"></ion-toggle>
+          </ion-item>
+
+          <!-- 8 -->
+          <ion-item lines="none">
+            <ion-label>Oreo Crumbs <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+          <!-- 9 -->
+          <ion-item lines="none">
+            <ion-label>Crystal Boba <div class="price">₱10</div></ion-label>
+            <ion-toggle slot="end" data-price="10"></ion-toggle>
+          </ion-item>
+
+          <!-- 10 -->
+          <ion-item lines="none">
+            <ion-label>Chia Seeds <div class="price">₱10</div></ion-label>
+            <ion-toggle slot="end" data-price="10"></ion-toggle>
+          </ion-item>
+
+          <!-- 11 -->
+          <ion-item lines="none">
+            <ion-label>Aloe Vera <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+          <!-- 12 -->
+          <ion-item lines="none">
+            <ion-label>Konjac Jelly <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+          <!-- 13 -->
+          <ion-item lines="none">
+            <ion-label>Assorted Fruits <div class="price">₱20</div></ion-label>
+            <ion-toggle slot="end" data-price="20"></ion-toggle>
+          </ion-item>
+
+          <!-- 14 -->
+          <ion-item lines="none">
+            <ion-label>Extra Shot of Espresso <div class="price">₱25</div></ion-label>
+            <ion-toggle slot="end" data-price="25"></ion-toggle>
+          </ion-item>
+
+          <!-- 15 -->
+          <ion-item lines="none">
+            <ion-label>Matcha Powder <div class="price">₱20</div></ion-label>
+            <ion-toggle slot="end" data-price="20"></ion-toggle>
+          </ion-item>
+
+          <!-- 16 -->
+          <ion-item lines="none">
+            <ion-label>Cereal Crunch <div class="price">₱20</div></ion-label>
+            <ion-toggle slot="end" data-price="20"></ion-toggle>
+          </ion-item>
+
+          <!-- 17 -->
+          <ion-item lines="none">
+            <ion-label>Whipped Cream <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+          <!-- 18 -->
+          <ion-item lines="none">
+            <ion-label>Brown Sugar Syrup <div class="price">₱10</div></ion-label>
+            <ion-toggle slot="end" data-price="10"></ion-toggle>
+          </ion-item>
+
+          <!-- 19 -->
+          <ion-item lines="none">
+            <ion-label>Caramel Sauce <div class="price">₱10</div></ion-label>
+            <ion-toggle slot="end" data-price="10"></ion-toggle>
+          </ion-item>
+
+          <!-- 20 -->
+          <ion-item lines="none">
+            <ion-label>Taro Bits <div class="price">₱15</div></ion-label>
+            <ion-toggle slot="end" data-price="15"></ion-toggle>
+          </ion-item>
+
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
+```
+</Tab>
+<Tab value="home.page.scss">
+```scss title="home.page.scss"
+ion-header {
+  ion-toolbar {
+    --padding: 2rem 0;
+    text-align: center;
+
+    --background: hsl(var(--tea-cream));
+    --color: hsl(var(--tea-brown));
+
+    ion-title {
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      font-weight: bold;
+      color: hsl(var(--tea-brown));
+    }
+
+    p {
+      margin-bottom: 2rem;
+    }
+  }
+}
+
+ion-toggle {
+  padding: 8px;
+
+  --track-background: #ddd;
+  --track-background-checked: #ddd;
+
+  --handle-background: hsl(var(--tea-caramel));
+  --handle-background-checked: hsl(var(--tea-brown));
+
+  --handle-width: 16px;
+  --handle-height: 16px;
+  --handle-max-height: auto;
+  --handle-spacing: 6px;
+
+  --handle-border-radius: 4px;
+  --handle-box-shadow: none;
+}
+
+ion-toggle::part(track) {
+  height: 6px;
+  width: 50px;
+
+  /* Required for iOS handle to overflow the height of the track */
+  overflow: visible;
+}
+
+.header {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 40rem;
+
+  .header-card {
+    background: linear-gradient(-45deg, hsl(25, 45%, 59%), hsl(30 45% 70%));
+    border: hsl(var(--accent)) solid 2px;
+
+    ion-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: hsl(var(--tea-brown));
+    }
+
+    ion-card-subtitle {
+      color: hsl(var(--tea-brown));
+    }
+
+    ion-card-content {
+      h2 {
+        font-weight: 600;
+        color: hsl(var(--tea-brown));
+      }
+    }
+  }
+}
+
+.add-ons {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 30rem;
+
+  ion-col {
+    ion-list {
+      background-color: hsl(var(--accent));
+      border: hsl(var(--accent)) solid 2px;
+      border-radius: 8px;
+
+      ion-list-header {
+        font-weight: bold;
+        color: hsl(var(--tea-brown));
+      }
+
+      ion-item {
+
+        ion-label {
+          display: flex;
+          justify-content: space-between;
+          margin-right: 2rem;
+
+          .price {
+            font-weight: bold;
+          }
+        }
+
+      }
+    }
+  }
+}
+```
+</Tab>
+<Tab value="variables.scss">
+```scss title="variables.scss"
+:root {
+	--gradient-primary: linear-gradient(135deg, hsl(25 35% 25%), hsl(30 45% 70%)) !important;
+	--gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(35 20% 88%)) !important;
+
+	--background: 45 20% 97% !important;
+	--foreground: 25 20% 15% !important;
+
+	--card: 0 0% 100% !important;
+	--card-foreground: 25 20% 15% !important;
+
+	--popover: 0 0% 100%;
+	--popover-foreground: 25 20% 15%;
+
+	--primary: 25 35% 25%;
+	--primary-foreground: 45 25% 95%;
+
+	--secondary: 35 25% 85%;
+	--secondary-foreground: 25 30% 20%;
+
+	--muted: 40 15% 92%;
+	--muted-foreground: 25 15% 45%;
+
+	--accent: 35 40% 75%;
+	--accent-foreground: 25 30% 20%;
+
+	--destructive: 0 84.2% 60.2%;
+	--destructive-foreground: 210 40% 98%;
+
+	--border: 35 20% 88%;
+	--input: 35 20% 88%;
+	--ring: 25 35% 25%;
+
+	/* Milk tea themed colors */
+	--tea-brown: 25 35% 25%;
+	--tea-cream: 45 25% 95%;
+	--tea-latte: 35 25% 85%;
+	--tea-caramel: 30 45% 70%;
+	--tea-matcha: 120 25% 65%;
+
+	// Background and Text
+	--ion-background-color: hsl(var(--background));
+	--ion-text-color: hsl(var(--foreground));
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+### Output
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLNaJZgA5JM6Dlun2xAOCcF1t8kr9XN4H7oLSR"
+  alt="Exercise 1 Output"
+  width={3600}
+  height={2025}
+/>
+
+<span>rush eh</span>
