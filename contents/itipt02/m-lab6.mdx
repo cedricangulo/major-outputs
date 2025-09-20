@@ -1,0 +1,352 @@
+---
+title: Laboratory 6
+---
+
+### Instructions
+
+**Objective**
+
+Implement a front-end user interface using Ionic Framework's range slider components to simulate real-world control panels for different applications.
+
+**Components**
+
+- Use Ionic range sliders (`ion-range`) to represent the parameters specified in each exercise.
+- Provide the required number of range sliders as per the problem description (e.g., 5 or 6 sliders with given value ranges).
+- Include read-only input boxes that display current slider values and calculated values as specified in each exercise.
+
+---
+
+**Fitness Tracker Goal Setting**
+
+**Sliders:**
+
+- Daily Step Goal: 1000 to 20000 steps
+- Heart Rate Max: 120 to 190 bpm
+- Sleep Goal: 5 to 9 hours
+- Calories Burned Goal: 100 to 1000 kcal
+- Water Intake Goal: 1 to 5 liters
+- Active Minutes: 10 to 120 minutes
+
+**Input boxes:**
+
+- One showing combined Calories + Water Intake
+- One showing Heart Rate Max
+
+---
+
+### Code
+
+<Tabs items={["home.page.html", "home.page.scss"]}>
+<Tab value="home.page.html">
+```html title="home.page.html"
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Fitness Tracker Goals
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Fitness Tracker Goals</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <div class="goals-section">
+      <h2>Set Your Daily Goals</h2>
+      
+      <!-- Daily Step Goal -->
+      <div class="slider-group">
+        <ion-item>
+          <ion-label position="stacked">Daily Step Goal</ion-label>
+          <ion-range
+            min="1000"
+            max="20000"
+            step="100"
+            pin="true"
+            value="10000"
+            aria-label="Daily step goal">
+            <ion-label slot="start">1K</ion-label>
+            <ion-label slot="end">20K</ion-label>
+          </ion-range>
+        </ion-item>
+        <div class="value-display">Current: <span aria-live="polite" class="value">10000</span> steps</div>
+      </div>
+
+      <!-- Heart Rate Max -->
+      <div class="slider-group">
+        <ion-item>
+          <ion-label position="stacked">Heart Rate Max</ion-label>
+          <ion-range
+            min="120"
+            max="190"
+            step="1"
+            pin="true"
+            value="155"
+            aria-label="Heart rate maximum">
+            <ion-label slot="start">120</ion-label>
+            <ion-label slot="end">190</ion-label>
+          </ion-range>
+        </ion-item>
+        <div class="value-display">Current: <span aria-live="polite" class="value">155</span> bpm</div>
+      </div>
+
+      <!-- Sleep Goal -->
+      <div class="slider-group">
+        <ion-item>
+          <ion-label position="stacked">Sleep Goal</ion-label>
+          <ion-range
+            min="5"
+            max="9"
+            step="0.5"
+            pin="true"
+            value="7"
+            aria-label="Sleep goal hours">
+            <ion-label slot="start">5h</ion-label>
+            <ion-label slot="end">9h</ion-label>
+          </ion-range>
+        </ion-item>
+        <div class="value-display">Current: <span aria-live="polite" class="value">7</span> hours</div>
+      </div>
+
+      <!-- Calories Burned Goal -->
+      <div class="slider-group">
+        <ion-item>
+          <ion-label position="stacked">Calories Burned Goal</ion-label>
+          <ion-range
+            min="100"
+            max="1000"
+            step="10"
+            pin="true"
+            value="500"
+            aria-label="Calories burned goal">
+            <ion-label slot="start">100</ion-label>
+            <ion-label slot="end">1000</ion-label>
+          </ion-range>
+        </ion-item>
+        <div class="value-display">Current: <span aria-live="polite" class="value">500</span> kcal</div>
+      </div>
+
+      <!-- Water Intake Goal -->
+      <div class="slider-group">
+        <ion-item>
+          <ion-label position="stacked">Water Intake Goal</ion-label>
+          <ion-range
+            min="1"
+            max="5"
+            step="0.1"
+            pin="true"
+            value="2.5"
+            aria-label="Daily water intake liters">
+            <ion-label slot="start">1L</ion-label>
+            <ion-label slot="end">5L</ion-label>
+          </ion-range>
+        </ion-item>
+        <div class="value-display">Current: <span aria-live="polite" class="value">2.5</span> liters</div>
+      </div>
+
+      <!-- Active Minutes -->
+      <div class="slider-group">
+        <ion-item>
+          <ion-label position="stacked">Active Minutes</ion-label>
+          <ion-range
+            min="10"
+            max="120"
+            step="5"
+            pin="true"
+            value="60"
+            aria-label="Active minutes per day">
+            <ion-label slot="start">10</ion-label>
+            <ion-label slot="end">120</ion-label>
+          </ion-range>
+        </ion-item>
+        <div class="value-display">Current: <span aria-live="polite" class="value">60</span> minutes</div>
+      </div>
+
+      <!-- Calculated Values Section -->
+      <div class="calculated-section">
+        <h3>Calculated Values</h3>
+        
+        <ion-item>
+          <ion-label position="stacked">Combined Calories + Water Intake</ion-label>
+          <ion-input 
+            readonly="true" 
+            value="502.5"
+            class="calculated-input">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Heart Rate Max Display</ion-label>
+          <ion-input 
+            readonly="true" 
+            value="155 bpm"
+            class="calculated-input">
+          </ion-input>
+        </ion-item>
+      </div>
+    </div>
+  </div>
+</ion-content>
+```
+</Tab>
+<Tab value="home.page.scss">
+```scss title="home.page.scss"
+:root {
+  /* Fitness color psychology palette
+     primary blue: trust, reliability
+     success green: health, balance
+     energy orange: action, motivation
+     neutral and muted for minimal UI */
+  --bg: #fbfdff;
+  --card-bg: #ffffff;
+  --surface: #f6f7f9;
+  --primary: #2f80ed; /* trust blue */
+  --success: #34c759; /* health green */
+  --energy: #ff7a18; /* energetic orange */
+  --muted: #6b7280;
+  --text: #0f1724;
+  --glass: rgba(255, 255, 255, 0.6);
+  --radius: 12px;
+}
+
+/* Page base */
+#container {
+  padding: 28px;
+  max-width: 880px;
+  margin: 0 auto;
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial;
+}
+
+.goals-section {
+  margin-bottom: 34px;
+}
+
+.goals-section h2 {
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 22px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* Minimalist card for each slider */
+.slider-group {
+  margin-bottom: 18px;
+  background: linear-gradient(180deg, var(--card-bg), var(--surface));
+  border-radius: var(--radius);
+  padding: 14px;
+  border: 1px solid rgba(15, 23, 36, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slider-group ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  border: none;
+}
+
+.slider-group ion-label {
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.slider-group ion-range {
+  padding: 6px 0 2px 0;
+}
+
+.value-display {
+  text-align: center;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+/* Calculated values as prominent, but minimal */
+.calculated-section {
+  margin-top: 32px;
+  padding: 16px;
+  background: linear-gradient(
+    90deg,
+    rgba(47, 128, 237, 0.95),
+    rgba(52, 199, 89, 0.92)
+  );
+  border-radius: 14px;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(47, 128, 237, 0.08);
+}
+
+.calculated-section h3 {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.calculated-section ion-item {
+  --background: rgba(255, 255, 255, 0.06);
+  --color: white;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.calculated-section ion-label {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 600;
+}
+
+.calculated-input {
+  --color: white !important;
+  --placeholder-color: rgba(255, 255, 255, 0.75) !important;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Range slider customization using palette */
+ion-range {
+  --bar-height: 6px;
+  --bar-border-radius: 6px;
+  --knob-size: 22px;
+}
+
+/* Start and end labels slightly muted */
+ion-range ion-label {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Small responsive tweaks */
+@media (max-width: 768px) {
+  #container {
+    padding: 18px;
+  }
+  .goals-section h2 {
+    font-size: 18px;
+  }
+  .slider-group {
+    padding: 12px;
+    border-radius: 10px;
+  }
+}
+```
+</Tab>
+</Tabs>
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLdmrWc2kO1gLIQVGa4ZRbsHw7MkWhenJu3xvU"
+  alt="Laboratory 6 Output"
+  width={1593}
+  height={896}
+/>
