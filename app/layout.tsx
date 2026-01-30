@@ -1,22 +1,21 @@
-import type { Metadata } from "next"
+import { RootProvider } from "fumadocs-ui/provider/next";
+import { Header } from "@/components/shared/header";
 
-import localFont from "next/font/local"
+import localFont from "next/font/local";
+import { Metadata } from "next";
 
-import { Header } from "@/components/shared/header"
-import Providers from "@/components/shared/theme-provider"
-
-import "./globals.css"
+import "./globals.css";
 
 const geistSans = localFont({
   src: "../public/fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
-})
+});
 const geistMono = localFont({
   src: "../public/fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
-})
+});
 
 export const metadata: Metadata = {
   title: {
@@ -44,33 +43,25 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "cedricc",
     description: "This is where I store my outputs from my major subjects.",
-    images: ["https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLKHE7DsIplfOcIvx0AMLZFeQT8ju5Bh6XqVUo"],
+    images: [
+      "https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLKHE7DsIplfOcIvx0AMLZFeQT8ju5Bh6XqVUo",
+    ],
   },
-}
+};
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function Layout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
+        <RootProvider>
           <Header />
-          <main
-            role="main"
-            className="mx-auto max-w-5xl p-4"
-          >
+          <main role="main" className="mx-auto max-w-5xl p-4">
             {children}
           </main>
-        </Providers>
+        </RootProvider>
       </body>
     </html>
-  )
+  );
 }

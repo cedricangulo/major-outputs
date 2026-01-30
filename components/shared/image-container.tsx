@@ -1,10 +1,10 @@
-import { ImageZoom } from "fumadocs-ui/components/image-zoom"
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
 
 interface ImageContainerProps {
-  src: string[]
-  alt: string[]
-  width?: number
-  height?: number
+  src: string[];
+  alt: string[];
+  width?: number;
+  height?: number;
 }
 
 const ImageContainer = ({
@@ -26,7 +26,7 @@ const ImageContainer = ({
         />
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default ImageContainer
+export { ImageContainer };

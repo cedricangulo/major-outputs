@@ -1,0 +1,30 @@
+---
+title: Laboratory 2
+---
+
+#### direction
+
+Create a chessboard using any loop.
+
+```php
+<?php
+
+// Define the size of each cell
+$size = "100px";
+$color1 = "white";
+$color2 = "green";
+
+echo "<table style='border-collapse: collapse; border: 1px solid black; margin: auto;'>";
+
+for ($a = 0; $a < 8; $a++) {
+  echo "<tr>";
+  for ($b = 0; $b < 8; $b++) {
+    $color = ($a + $b) % 2 == 0 ? $color1 : $color2;
+    echo "<td style='width: $size; height: $size; background-color: $color;'></td>";
+  }
+  echo "</tr>";
+}
+
+echo "</table>";
+?>
+```

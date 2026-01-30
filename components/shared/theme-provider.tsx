@@ -1,28 +1,24 @@
-"use client"
+"use client";
 
-import { ThemeProvider } from "next-themes"
+import { RootProvider } from "fumadocs-ui/provider/next";
+import "fumadocs-ui/style.css";
+import { ThemeProvider } from "next-themes";
 
-import { useEffect, useState } from "react"
-import { ReactNode } from "react"
+import { ReactNode } from "react";
 
-export default function Providers({ children }: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false)
+export { ThemeProvider };
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return null
-  }
-
+export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-    >
-      {children}
-    </ThemeProvider>
-  )
+    <RootProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        {children}
+      </ThemeProvider>
+    </RootProvider>
+  );
 }

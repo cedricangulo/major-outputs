@@ -1,17 +1,12 @@
-import React, { FC } from "react"
+import Link from "next/link";
 
-import Link from "next/link"
+import { ModeToggle } from "./mode-toggle";
 
-import { ModeToggle } from "./mode-toggle"
-
-export const Header: FC = () => {
+export function Header() {
   return (
     <header className="container mx-auto max-w-4xl p-4">
       <div className="flex items-center gap-2 font-mono font-medium w-fit mx-auto">
-        <Link
-          className="flex items-center gap-2"
-          href="/"
-        >
+        <Link className="flex items-center gap-2" href="/">
           cedric
         </Link>{" "}
         <span className="text-muted-foreground">|</span>
@@ -24,23 +19,18 @@ export const Header: FC = () => {
         </Link>
         <span className="text-muted-foreground">|</span>{" "}
         <Link
-          href="https://cedricangulo.vercel.app"
+          href="https://cedricangulo.is-a.dev"
           target="_blank"
           rel="noreferrer"
         >
           portfolio
         </Link>
         <span className="text-muted-foreground">|</span>{" "}
-        <Link
-          href="https://bento.me/cedricc"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <Link href="https://bento.me/cedricc" target="_blank" rel="noreferrer">
           bento
         </Link>
         <span className="text-muted-foreground">|</span> <ModeToggle />
       </div>
     </header>
-  )
+  );
 }
-Header.displayName = "Header"

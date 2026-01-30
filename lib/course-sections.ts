@@ -6,7 +6,6 @@ export const courseSections = [
     section: "1E",
     laboratoriesLink: "/itwst01",
     caseStudyLink: "https://webwisee.vercel.app/",
-    className: "border-b md:border-r",
   },
   {
     subject: "IT-WST02",
@@ -15,7 +14,6 @@ export const courseSections = [
     section: "2A",
     laboratoriesLink: "/itwst02",
     caseStudyLink: "https://rnlsevilla.vercel.app/",
-    className: "border-b lg:border-r",
   },
   {
     subject: "IT-PF01",
@@ -23,7 +21,6 @@ export const courseSections = [
     teacher: "Prince Mert Nicolas",
     section: "2A",
     laboratoriesLink: "/itpf01",
-    className: "border-b md:border-r lg:border-r-0",
   },
   {
     subject: "IT-PF02",
@@ -31,7 +28,6 @@ export const courseSections = [
     teacher: "Prince Mert Nicolas",
     section: "2A",
     laboratoriesLink: "/itpf02",
-    className: "border-b lg:border-b lg:border-r",
   },
   {
     subject: "IT-HCI01",
@@ -39,7 +35,6 @@ export const courseSections = [
     teacher: "Marcelino Collado Jr.",
     section: "2A",
     laboratoriesLink: "/ithci01",
-    className: "md:border-r border-b md:border-b",
   },
   {
     subject: "CC-104",
@@ -47,7 +42,6 @@ export const courseSections = [
     teacher: "Apple Oliveros",
     section: "2A",
     laboratoriesLink: "/cc104",
-    className: "border-b",
   },
   {
     subject: "CC-105",
@@ -55,7 +49,6 @@ export const courseSections = [
     teacher: "Cris Norman Olipas",
     section: "2A",
     laboratoriesLink: "/cc105",
-    className: "border-b lg:border-b-0 md:border-r",
   },
   {
     subject: "IT-IPT01",
@@ -63,7 +56,6 @@ export const courseSections = [
     teacher: "Melgine Bauat",
     section: "3C",
     laboratoriesLink: "/itipt01",
-    className: "border-b lg:border-r lg:border-0",
   },
   {
     subject: "IT-IPT02",
@@ -71,6 +63,19 @@ export const courseSections = [
     teacher: "Nino Herrera",
     section: "3C",
     laboratoriesLink: "/itipt02",
-    className: "md:border-r lg:border-r-0 lg:border-l",
   },
-]
+  {
+    subject: "IT-WST03",
+    year: "2025-2026 2nd sem",
+    teacher: "Andrew Ceasar A. Villegas",
+    section: "3C",
+    laboratoriesLink: "/itwst03",
+  },
+  {
+    subject: "IT-WST05",
+    year: "2025-2026 2nd sem",
+    teacher: "Angelito I. Cunanan Jr.",
+    section: "3C",
+    laboratoriesLink: "/itwst05",
+  },
+];

@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import { LoaderIcon } from "lucide-react"
-import { useTheme } from "next-themes"
+import { LoaderIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
-import { Button } from "../ui/button"
+import { Button } from "../ui/button";
 
 export function ModeToggle() {
-  const { setTheme, theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { setTheme, theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
       <div className="size-8 grid place-content-center">
         <LoaderIcon className="text-foreground size-4 animate-spin" />
       </div>
-    )
+    );
   }
 
-  const isLight = theme === "light"
+  const isLight = theme === "light";
 
   return (
     <Button
@@ -43,11 +43,7 @@ export function ModeToggle() {
         strokeLinejoin="round"
         className="size-4.5"
       >
-        <path
-          stroke="none"
-          d="M0 0h24v24H0z"
-          fill="none"
-        ></path>
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
         <path d="M12 3l0 18"></path>
         <path d="M12 9l4.65 -4.65"></path>
@@ -56,5 +52,5 @@ export function ModeToggle() {
       </svg>
       <span className="sr-only">Toggle theme</span>
     </Button>
-  )
+  );
 }

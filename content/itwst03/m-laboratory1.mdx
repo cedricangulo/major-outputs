@@ -1,0 +1,51 @@
+---
+title: Laboratory 1
+---
+
+#### direction
+
+Create a simple navigation menu using links and conditionals.
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Document</title>
+  </head>
+  <body class="p-8">
+    <div class="space-x-4 border-b pb-4">
+      <a href="?lesson=1">Lesson 1</a>
+      <a href="?lesson=2">Lesson 2</a>
+      <a href="?lesson=3">Lesson 3</a>
+      <a href="?lesson=4">Lesson 4</a>
+    </div>
+    <?php
+      if (isset($_GET['lesson'])) {
+        
+        $lesson = $_GET['lesson'];
+        
+        switch ($lesson) {
+          case 1:
+            echo "<h1>Lesson 1</h1>";
+            break;
+          case 2:
+            echo "<h1>Lesson 2</h1>";
+            break;
+          case 3:
+            echo "<h1>Lesson 3</h1>";
+            break;
+          case 4:
+            echo "<h1>Lesson 4</h1>";
+            break;
+          default:
+            echo "<h1>Lesson not found</h1>";
+            break;
+        }
+      }
+    ?>
+  </body>
+</html>
+```
