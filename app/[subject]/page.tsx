@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
-
+import { subjectFullNames } from "@/components/shared/course-section";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { StripedDivider } from "@/components/shared/striped-divider";
 import { SubjectHeader } from "@/components/shared/subject-header";
@@ -87,7 +87,25 @@ export default async function Page({ params }: Props) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { subject } = await params;
+  const title = formatSubject(subject);
+
   return {
-    title: formatSubject(subject),
+    title,
+    openGraph: {
+      images: [
+        {
+          url: `/api/og?title=${encodeURIComponent(title)}&subject=${encodeURIComponent(subjectFullNames[formatSubject(subject)])}`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [
+        `/api/og?title=${encodeURIComponent(title)}&subject=${encodeURIComponent(subjectFullNames[formatSubject(subject)])}`,
+      ],
+    },
   };
 }

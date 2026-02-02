@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const page = source.getPage([output]);
+  const page = source.getPage([subject, output]);
 
   if (!page) {
     return {
@@ -71,6 +71,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: page.data.title,
     description: page.data.description,
+    openGraph: {
+      images: [
+        {
+          url: `/api/og?title=${encodeURIComponent(page.data.title)}&subject=${encodeURIComponent(formatSubject(subject))}`,
+          width: 1200,
+          height: 630,
+          alt: page.data.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [
+        `/api/og?title=${encodeURIComponent(page.data.title)}&subject=${encodeURIComponent(formatSubject(subject))}`,
+      ],
+    },
   };
 }
 

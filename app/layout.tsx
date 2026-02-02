@@ -1,8 +1,8 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
-import { Header } from "@/components/shared/header";
+import type { Metadata } from "next";
 
 import localFont from "next/font/local";
-import { Metadata } from "next";
+import { Header } from "@/components/shared/header";
 
 import "./globals.css";
 
@@ -18,6 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://cedricc.vercel.app"),
   title: {
     template: "cedric | %s",
     default: "cedric",
@@ -57,9 +58,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       >
         <RootProvider>
           <Header />
-          <main role="main" className="mx-auto max-w-5xl p-4">
-            {children}
-          </main>
+          <main className="mx-auto max-w-5xl p-4">{children}</main>
         </RootProvider>
       </body>
     </html>
