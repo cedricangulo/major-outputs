@@ -1,0 +1,47 @@
+---
+title: Laboratory 1
+---
+
+#### Administrative Setup (XAMPP)
+
+We configured `xampp-control.exe` to Run as Administrator.
+
+- Why: This gives the software the required permissions to manage Apache and MySQL services.
+- Result: It prevents the system from blocking the control panel when starting or stopping services, making it easier to exit the program completely.
+
+#### File Structure & Mapping
+
+We created a folder named `mywebsite` inside `htdocs`.
+
+- Index Files: We observed that naming a file `index.php` allows the browser to load it automatically without typing the filename in the URL.
+- Directory Listing: When we renamed the file, the browser showed a list of all files in the folder. This is a security risk called Information Gathering.
+- Mapping: This exercise showed how attackers can see the "topographical points" (files and folders) of an application.
+
+#### Securing the Server with .htaccess
+
+To prevent people from seeing our file list, we used a configuration file called `.htaccess`.
+
+- Disabling Indexes: We added `Options -Indexes` to hide the file list from the public.
+- URL Cleaning: We used the following code to hide the `.php` extension, making the application harder to fingerprint:
+
+```apache title=".htaccess" lineNumbers
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+Options -Indexes
+```
+
+#### Database User Management (phpMyAdmin)
+
+We practiced securing the database, which is a critical Asset.
+  - User Creation: We created a new user in phpMyAdmin and assigned specific passwords.
+  - Securing Root: We added a password to the root@localhost account to prevent unauthorized access.
+  - Authentication Config: We modified config.inc.php to strengthen the login system:
+    - `auth_type` = 'cookie': This forces the browser to show a login screen instead of logging in automatically.
+    - `AllowNoPassword` = false: This prevents users without passwords from entering the database.
+
+#### Key Security Lessons
+- Prevention: Stopping threats by closing "holes" like directory listing and empty passwords.
+- Detection: Monitoring how the system reacts to different URLs and login attempts.
+- Balance: We learned that security is a measurement that must be balanced with how easy the system is to use.

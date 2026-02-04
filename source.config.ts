@@ -25,7 +25,7 @@ export default defineConfig({
         light: "github-light",
         dark: "github-dark",
       },
-      langs: ["js", "jsx", "ts", "tsx", "php"],
+      langs: ["js", "jsx", "ts", "tsx", "php", "apache"],
     },
   },
 });
