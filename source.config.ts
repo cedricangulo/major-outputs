@@ -9,6 +9,8 @@ const extendedSchema = frontmatterSchema.extend({
   description: z.string().optional(),
   draft: z.boolean().optional(),
   date: z.date().optional(),
+  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+  files: z.number().optional(),
 });
 
 export const docs = defineDocs({

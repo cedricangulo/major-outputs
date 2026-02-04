@@ -1,18 +1,33 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import React from "react";
 import { subjectFullNames } from "@/components/shared/course-section";
+import { LabCard } from "@/components/shared/lab-card";
 import { PageWrapper } from "@/components/shared/page-wrapper";
-import { StripedDivider } from "@/components/shared/striped-divider";
 import { SubjectHeader } from "@/components/shared/subject-header";
 import { getSource } from "@/lib/source";
 import { formatSubject } from "@/lib/utils";
+
+interface LabFrontmatter {
+  title: string;
+  draft?: boolean;
+  description?: string;
+  difficulty?: "easy" | "medium" | "hard";
+  files?: number;
+}
 
 interface Props {
   params: Promise<{
     subject: string;
   }>;
+}
+
+function detectContentType(
+  url: string,
+): "laboratory" | "exercise" | "case-study" | "default" {
+  if (url.includes("lab")) return "laboratory";
+  if (url.includes("exercise")) return "exercise";
+  if (url.includes("case")) return "case-study";
+  return "default";
 }
 
 export default async function Page({ params }: Props) {
@@ -26,7 +41,7 @@ export default async function Page({ params }: Props) {
   const allPages = source.getPages();
 
   const filteredLabs = allPages.filter((page) => {
-    const frontmatter = page.data as { draft?: boolean };
+    const frontmatter = page.data as LabFrontmatter;
     return !frontmatter.draft;
   });
 
@@ -35,52 +50,65 @@ export default async function Page({ params }: Props) {
     finalLabs: filteredLabs.filter((lab) => lab.url.includes("/f-")),
   };
 
-  const renderLabs = (labs: typeof filteredLabs) =>
-    labs
-      .sort((a, b) => {
-        const getNumber = (title: string | undefined) => {
-          if (!title) return 0;
-          const match = title.match(/\d+/);
-          return match ? parseInt(match[0], 10) : 0;
-        };
-        return getNumber(a.data.title) - getNumber(b.data.title);
-      })
-      .map((lab) => (
-        <React.Fragment key={lab.url}>
-          <Link href={lab.url}>{lab.data.title}</Link>
-        </React.Fragment>
-      ));
+  const metadata = {
+    midtermCount: labCategories.midtermLabs.length,
+    finalCount: labCategories.finalLabs.length,
+    totalCount: filteredLabs.length,
+  };
 
   return (
     <PageWrapper>
-      <StripedDivider variant="top" />
-      <SubjectHeader subject={subject} backHref="/" />
-      <StripedDivider variant="middle" className="mt-12" />
+      <SubjectHeader subject={subject} backHref="/" metadata={metadata} />
 
-      {Object.entries(labCategories).map(([category, labs]) => {
-        const hasLabs = filteredLabs.length > 0;
+      <main className="py-12">
+        {Object.entries(labCategories).map(([category, labs]) => {
+          const hasLabs = filteredLabs.length > 0;
 
-        return labs.length > 0 ? (
-          <div key={category} className="mt-10 pb-10">
-            <h2 className="text-center text-lg tracking-tighter font-semibold mb-6">
-              {category === "midtermLabs" ? "Midterm" : "Final"}
-            </h2>
-            <div className="text-center grid grid-cols-2 md:grid-cols-3 gap-4">
-              {renderLabs(labs)}
-            </div>
-          </div>
-        ) : hasLabs ? null : (
-          <div key={category} className="mt-10 pb-10">
-            <h2 className="text-center text-lg tracking-tighter font-semibold mb-6">
-              {category === "midtermLabs" ? "Midterm" : "Final"}
-            </h2>
-            <p className="text-center text-red-600">
-              No laboratory/case problems found.
-            </p>
-          </div>
-        );
-      })}
-      <StripedDivider variant="bottom" />
+          if (labs.length === 0 && hasLabs) return null;
+
+          const sortedLabs = labs.sort((a, b) => {
+            const getNumber = (title: string | undefined) => {
+              if (!title) return 0;
+              const match = title.match(/\d+/);
+              return match ? parseInt(match[0], 10) : 0;
+            };
+            return getNumber(a.data.title) - getNumber(b.data.title);
+          });
+
+          return (
+            <section key={category} className="mb-12 last:mb-0">
+              <h2 className="text-lg font-semibold tracking-tight mb-6">
+                {category === "midtermLabs" ? "Midterms" : "Finals"}
+              </h2>
+              {sortedLabs.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {sortedLabs.map((lab) => {
+                    const frontmatter = lab.data as LabFrontmatter;
+                    return (
+                      <LabCard
+                        key={lab.url}
+                        title={frontmatter.title}
+                        href={lab.url}
+                        description={frontmatter.description}
+                        difficulty={frontmatter.difficulty}
+                        contentType={detectContentType(lab.url)}
+                        fileCount={frontmatter.files}
+                        category={
+                          category === "midtermLabs" ? "midterm" : "final"
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground">
+                  No laboratory/case problems found.
+                </p>
+              )}
+            </section>
+          );
+        })}
+      </main>
     </PageWrapper>
   );
 }

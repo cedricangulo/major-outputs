@@ -1,27 +1,11 @@
-import type { FC, ReactNode } from "react";
-
-import { CornerDecoration } from "./corner-decoration";
+import React, { type FC, type ReactNode } from "react";
 
 interface PageWrapperProps {
   children: ReactNode;
 }
 
-const CORNER_POSITIONS = [
-  "top-right",
-  "top-left",
-  "bottom-left",
-  "bottom-right",
-] as const;
-
 const PageWrapper: FC<PageWrapperProps> = ({ children }) => {
-  return (
-    <div className="relative border">
-      {CORNER_POSITIONS.map((position) => (
-        <CornerDecoration key={position} position={position} />
-      ))}
-      {children}
-    </div>
-  );
+  return <div className="py-6">{children}</div>;
 };
 
 PageWrapper.displayName = "PageWrapper";

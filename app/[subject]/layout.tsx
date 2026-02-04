@@ -1,6 +1,7 @@
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { baseOptions } from "@/lib/layout.shared";
 import type { ReactNode } from "react";
+
+import { baseOptions } from "@/lib/layout.shared";
 
 interface Props {
   children: ReactNode;

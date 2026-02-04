@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { PageWrapper } from "@/components/shared/page-wrapper";
-import { StripedDivider } from "@/components/shared/striped-divider";
 import { SubjectHeader } from "@/components/shared/subject-header";
 import { getSource, validSubjects } from "@/lib/source";
 import { formatSubject } from "@/lib/utils";
 import { getMDXComponents } from "@/mdx-components";
+
+type Frontmatter = {
+  title: string;
+  description?: string;
+  difficulty?: "easy" | "medium" | "hard";
+  files?: number;
+};
 
 interface Props {
   params: Promise<{
@@ -14,8 +20,7 @@ interface Props {
     output: string;
   }>;
 }
-
-export default async function Page({ params }: Props) {
+const OutputPage = async ({ params }: Props) => {
   const { subject, output } = await params;
   const source = getSource(subject);
 
@@ -30,25 +35,33 @@ export default async function Page({ params }: Props) {
   }
 
   const MDX = page.data.body;
+  const frontmatter = page.data as Frontmatter;
+  const { description, difficulty, files } = frontmatter;
 
   return (
     <PageWrapper>
-      <StripedDivider variant="top" />
       <SubjectHeader
         subject={subject}
         title={page.data.title}
         backHref={`/${subject}`}
+        contentMeta={{
+          description,
+          difficulty,
+          files,
+          url: page.url,
+        }}
       />
-      <StripedDivider variant="middle" className="mt-12" />
 
-      <article className="prose prose-slate dark:prose-invert max-w-none px-2 md:px-4 mb-8">
+      <article className="prose prose-slate dark:prose-invert max-w-none py-8">
         <MDX components={getMDXComponents()} />
       </article>
-
-      <StripedDivider variant="bottom" />
     </PageWrapper>
   );
-}
+};
+
+OutputPage.displayName = "OutputPage";
+
+export default OutputPage;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { subject, output } = await params;

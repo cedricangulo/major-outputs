@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { FC } from "react";
 
@@ -37,78 +37,84 @@ const CourseSection: FC<CourseSectionProps> = ({
   year,
 }) => {
   const fullSubjectName = subjectFullNames[subject] || subject;
+
   return (
-    <div className="group border border-accent p-8">
-      <h2 className="section-heading">
-        {subject}
-        <span aria-label="section" className="text-metadata">
-          section: {section}
-        </span>
-      </h2>
-      <p aria-label="subject" className="sr-only text-sm m-0 transition-all">
-        {fullSubjectName}
-      </p>
-      <p aria-label="academic year" className="text-metadata m-0">
-        {year}
-      </p>
-      <p aria-label="teacher" className="text-metadata m-0 mb-4">
-        {teacher}
-      </p>
+    <article className="group border rounded-lg p-6 bg-card transition-colors hover:border-muted-foreground/30">
+      <header className="mb-4">
+        <h2
+          className="text-lg font-semibold tracking-tight mb-1"
+          title={fullSubjectName}
+        >
+          {subject}
+        </h2>
+        <p className="sr-only">{fullSubjectName}</p>
+        <div className="space-y-0.5">
+          <p className="text-sm text-muted-foreground">{year}</p>
+          <p className="text-sm text-muted-foreground">{teacher}</p>
+          <p className="text-sm text-muted-foreground font-mono">
+            Section {section}
+          </p>
+        </div>
+      </header>
+
       {caseStudyLink ? (
-        <>
-          <Tabs defaultValue="laboratories">
-            <ScrollArea>
-              <TabsList className="mb-3 bg-transparent">
-                <TabsTrigger
-                  value="laboratories"
-                  className="data-[state=active]:bg-muted data-[state=active]:shadow-none"
-                >
-                  Lab
-                </TabsTrigger>
-                <TabsTrigger
-                  value="case-study"
-                  className="data-[state=active]:bg-muted data-[state=active]:shadow-none"
-                >
-                  Case Study
-                </TabsTrigger>
-              </TabsList>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-            <TabsContent className="m-0" value="laboratories" asChild>
-              <Link
-                className="text-link"
-                href={laboratoriesLink}
-                aria-label="View laboratory materials"
+        <Tabs defaultValue="laboratories" className="w-full">
+          <ScrollArea className="w-full">
+            <TabsList className="h-8 bg-muted/50 p-1 mb-3">
+              <TabsTrigger
+                value="laboratories"
+                className="text-xs h-6 px-3 data-[state=active]:bg-background data-[state=active]:shadow-none"
               >
-                View
-                <ArrowRight className="inline size-4" aria-hidden="true" />
-              </Link>
-            </TabsContent>
-            <TabsContent className="m-0" value="case-study" asChild>
-              <Link
-                href={caseStudyLink}
-                target="_blank"
-                rel="noreferrer"
-                className="text-link"
-                aria-label={`Open case study: ${caseStudyLink}`}
+                Labs
+              </TabsTrigger>
+              <TabsTrigger
+                value="case-study"
+                className="text-xs h-6 px-3 data-[state=active]:bg-background data-[state=active]:shadow-none"
               >
-                {caseStudyLink}
-              </Link>
-            </TabsContent>
-          </Tabs>
-        </>
+                Case Study
+              </TabsTrigger>
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+
+          <TabsContent value="laboratories" className="mt-0">
+            <Link
+              href={laboratoriesLink}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+              aria-label={`View laboratory materials for ${subject}`}
+            >
+              View materials
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          </TabsContent>
+
+          <TabsContent value="case-study" className="mt-0">
+            <Link
+              href={caseStudyLink}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded max-w-full truncate"
+              aria-label={`Open case study for ${subject} (opens in new tab)`}
+            >
+              <span className="truncate">{caseStudyLink}</span>
+              <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
+            </Link>
+          </TabsContent>
+        </Tabs>
       ) : (
         <Link
           href={laboratoriesLink}
-          className="text-link"
-          aria-label="View laboratory materials"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+          aria-label={`View laboratory materials for ${subject}`}
         >
-          View
-          <ArrowRight className="inline size-4" aria-hidden="true" />
+          View materials
+          <ArrowRight className="size-3.5" aria-hidden="true" />
         </Link>
       )}
-    </div>
+    </article>
   );
 };
+
+CourseSection.displayName = "CourseSection";
 
 export { CourseSection };
