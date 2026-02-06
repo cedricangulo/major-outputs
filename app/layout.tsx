@@ -1,7 +1,7 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
-
 import localFont from "next/font/local";
+import { ViewTransitions } from "next-view-transitions";
 import { Header } from "@/components/shared/header";
 
 import "./globals.css";
@@ -52,15 +52,17 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <RootProvider>
-          <Header />
-          <main className="mx-auto max-w-5xl p-4">{children}</main>
-        </RootProvider>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <RootProvider>
+            <Header />
+            <main className="mx-auto max-w-5xl p-4">{children}</main>
+          </RootProvider>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

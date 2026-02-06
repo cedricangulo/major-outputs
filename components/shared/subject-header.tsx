@@ -6,7 +6,7 @@ import {
   Laptop,
   Pencil,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import type { FC } from "react";
 
 import { cn, formatSubject } from "@/lib/utils";

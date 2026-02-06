@@ -7,7 +7,7 @@ import {
   type LucideIcon,
   Pencil,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 import { cn } from "@/lib/utils";
 
