@@ -1,0 +1,161 @@
+---
+title: Laboratory 3
+description: Enhancement of Laboratory 1 with dynamic content and styling
+difficulty: medium
+files: 4
+---
+
+#### Task
+
+Enhance the navigation menu from Laboratory 1 by adding dynamic content and styling.
+
+### Code
+
+<Files className="mt-4">
+  <Folder name="lab3" defaultOpen>
+    <File name="index.php" />
+    <File name="listOfVariables.php" />
+    <File name="list_of_names.php" />
+    <File name="multiplication_table.php" />
+  </Folder>
+</Files>
+
+```php title="listOfVariables.php"
+<?php
+
+$navigation = array("Activity 1", "Activity 2", "Lab 3");
+
+?>
+```
+
+```php title="index.php"
+<?php
+
+include("listOfVariables.php");
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Group 6</title>
+  </head>
+  <body class="bg-[#fafafa] font-sans text-slate-800">
+    <!-- https://tailblocks.cc/ -->
+    <header class="text-gray-600 body-font">
+      <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+        <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
+          <span class="ml-3 text-xl">Group 6</span>
+        </a>
+        <nav class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+          <?php foreach ($navigation as $list) { ?>
+              <a class="mr-5 hover:text-gray-900" href="?activity=<?php echo $list; ?>">
+                <?php echo $list; ?>
+              </a>
+          <?php } ?>
+        </nav>
+      </div>
+    </header>
+    <?php
+      if (isset($_GET['activity'])) {
+        
+        $activity = $_GET['activity'];
+
+        if ($activity == "Activity 1") {
+          include("multiplication_table.php");
+        } else if ($activity == "Activity 2") {
+          include("list_of_names.php");
+        } else {
+          echo "<h1>Page not found</h1>";
+        }
+      }
+    ?>
+  </body>
+</html>
+```
+
+```php title="list_of_names.php"
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Of Names</title>
+  </head>
+  <body>
+    <div class="w-full max-w-md mx-auto">
+      <h2 class="text-3xl font-bold mb-8 text-blue-700 text-center">List of Names</h2>
+      <?php
+      $names = [
+          "Angulo, Cedric Bryan",
+          "Dela Vega, Catherine",
+          "Obillo, Cieldon John",
+          "Torres, Guia Cyleen"
+      ];
+      ?>
+      <ul class="space-y-3">
+        <?php foreach ($names as $name): ?>
+          <li class="p-4 bg-gray-50 border-l-4 border-blue-500 rounded hover:bg-blue-50 transition duration-200 shadow-sm text-gray-700 font-medium">
+            <?php echo $name; ?>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    </div>
+  </body>
+</html>
+```
+
+```php title="multiplication_table.php"
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Tailwind Multiplication Table</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <h2 class="text-3xl font-bold mb-8 text-blue-700 text-center">Multiplication Table</h2>
+    <table class="border-collapse bg-white shadow-xl mx-auto overflow-hidden">      
+      <thead>
+        <tr>
+          <th class="p-3 bg-blue-600 text-white border border-blue-500 sticky left-0 z-10">&times;</th>
+          <?php
+            for ($c = 1; $c <= 10; $c++) {
+              echo "<th class='p-3 w-12 h-12 bg-blue-600 text-white border border-blue-500 text-sm'>$c</th>";
+            }
+          ?>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+          for ($i = 1; $i <= 10; $i++) {
+            echo "<tr class='hover:bg-blue-50 transition-colors'>";
+            echo "<th class='p-3 bg-blue-600 text-white border border-blue-500 sticky left-0 z-10 text-sm'>$i</th>";
+
+            for ($c = 1; $c <= 10; $c++) {
+              $product = $i * $c;
+
+              if ($i == $c) {
+                $cellClass = "bg-amber-100 font-bold text-blue-900 border border-slate-200";
+              } else {
+                $cellClass = "border border-slate-200 text-slate-600";
+              }
+              
+              echo "<td class='p-3 text-center text-sm $cellClass'>$product</td>";
+            }
+            echo "</tr>";
+          }
+        ?>
+      </tbody>
+    </table>
+  </body>
+</html>
+```
+
+#### Routes
+
+- `http://localhost/lab3/?activity=Activity%201`
+- `http://localhost/lab3/?activity=Activity%202`
