@@ -1,6 +1,7 @@
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { Link } from "next-view-transitions";
 import type { FC } from "react";
+import * as React from "react";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -115,6 +116,7 @@ const CourseSection: FC<CourseSectionProps> = ({
   );
 };
 
-CourseSection.displayName = "CourseSection";
+const MemoizedCourseSection = React.memo(CourseSection);
+MemoizedCourseSection.displayName = "CourseSection";
 
-export { CourseSection };
+export { CourseSection, MemoizedCourseSection as default };

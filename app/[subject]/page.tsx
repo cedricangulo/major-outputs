@@ -1,11 +1,34 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { subjectFullNames } from "@/components/shared/course-section";
-import { LabCard } from "@/components/shared/lab-card";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { SubjectHeader } from "@/components/shared/subject-header";
 import { getSource } from "@/lib/source";
 import { formatSubject } from "@/lib/utils";
+
+// Dynamically import LabCard to reduce initial bundle size
+const LabCard = dynamic(
+  () =>
+    import("@/components/shared/lab-card").then((mod) => ({
+      default: mod.LabCard,
+    })),
+  {
+    loading: () => (
+      <div className="block p-4 border rounded-lg bg-card animate-pulse">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-muted rounded"></div>
+            <div className="h-4 bg-muted rounded w-32"></div>
+          </div>
+          <div className="w-4 h-4 bg-muted rounded"></div>
+        </div>
+        <div className="mt-2 h-3 bg-muted rounded w-full"></div>
+        <div className="mt-1 h-3 bg-muted rounded w-3/4"></div>
+      </div>
+    ),
+  },
+);
 
 interface LabFrontmatter {
   title: string;

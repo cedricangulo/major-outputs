@@ -1,21 +1,15 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import { ViewTransitions } from "next-view-transitions";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { Header } from "@/components/shared/header";
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import { GeistPixelSquare } from 'geist/font/pixel';
 
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "../public/fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../public/fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const fontVariables = `${GeistSans.variable} ${GeistMono.variable} ${GeistPixelSquare.variable}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cedricc.vercel.app"),
@@ -53,13 +47,13 @@ export const metadata: Metadata = {
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <ViewTransitions>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+      <html lang="en" suppressHydrationWarning className={fontVariables}>
+        <body className="antialiased">
           <RootProvider>
             <Header />
-            <main className="mx-auto max-w-5xl p-4">{children}</main>
+            <ErrorBoundary>
+              <main className="mx-auto max-w-5xl p-4">{children}</main>
+            </ErrorBoundary>
           </RootProvider>
         </body>
       </html>
