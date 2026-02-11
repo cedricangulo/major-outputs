@@ -5,9 +5,13 @@ import {
   ChevronDown,
   Copy,
   ExternalLinkIcon,
-  MessageCircleIcon,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import {
+  ButtonGroup,
+  ButtonGroupSeparator,
+} from "@/components/ui/button-group";
 import { useCopyButton } from "fumadocs-ui/utils/use-copy-button";
 import { buttonVariants } from "fumadocs-ui/components/ui/button";
 import {
@@ -15,8 +19,53 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "fumadocs-ui/components/ui/popover";
+import { Button } from "../ui/button";
 
 const cache = new Map<string, string>();
+
+async function copyText(text: string) {
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.top = "0";
+  textarea.style.left = "0";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
+async function copyMarkdown(markdownUrl: string) {
+  const content = await (async () => {
+    const cached = cache.get(markdownUrl);
+    if (cached !== undefined) return cached;
+    const fetched = await fetch(markdownUrl).then(async (res) => res.text());
+    cache.set(markdownUrl, fetched);
+    return fetched;
+  })();
+
+  if (
+    typeof navigator !== "undefined" &&
+    navigator.clipboard?.write &&
+    typeof ClipboardItem !== "undefined"
+  ) {
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        "text/plain": new Blob([content], { type: "text/plain" }),
+      }),
+    ]);
+    return;
+  }
+
+  await copyText(content);
+}
 
 export function LLMCopyButton({
   /**
@@ -28,22 +77,10 @@ export function LLMCopyButton({
 }) {
   const [isLoading, setLoading] = useState(false);
   const [checked, onClick] = useCopyButton(async () => {
-    const cached = cache.get(markdownUrl);
-    if (cached) return navigator.clipboard.writeText(cached);
-
     setLoading(true);
 
     try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          "text/plain": fetch(markdownUrl).then(async (res) => {
-            const content = await res.text();
-            cache.set(markdownUrl, content);
-
-            return content;
-          }),
-        }),
-      ]);
+      await copyMarkdown(markdownUrl);
     } finally {
       setLoading(false);
     }
@@ -81,6 +118,18 @@ export function ViewOptions({
    */
   githubUrl: string;
 }) {
+  const [isLoading, setLoading] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [checked, onClick] = useCopyButton(async () => {
+    setLoading(true);
+
+    try {
+      await copyMarkdown(markdownUrl);
+    } finally {
+      setLoading(false);
+    }
+  });
+
   const items = useMemo(() => {
     const fullMarkdownUrl =
       typeof window !== "undefined"
@@ -181,62 +230,72 @@ export function ViewOptions({
           </svg>
         ),
       },
-      {
-        title: "Open in Claude",
-        href: `https://claude.ai/new?${new URLSearchParams({
-          q,
-        })}`,
-        icon: (
-          <svg
-            fill="currentColor"
-            role="img"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <title>Anthropic</title>
-            <path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z" />
-          </svg>
-        ),
-      },
-      {
-        title: "Open in T3 Chat",
-        href: `https://t3.chat/new?${new URLSearchParams({
-          q,
-        })}`,
-        icon: <MessageCircleIcon />,
-      },
     ];
   }, [githubUrl, markdownUrl]);
 
   return (
-    <Popover>
-      <PopoverTrigger
-        className={cn(
-          buttonVariants({
-            color: "secondary",
-            size: "sm",
-            className: "gap-2",
-          }),
-        )}
+    <ButtonGroup aria-label="Page actions">
+      <Button
+        type="button"
+        disabled={isLoading}
+        onClick={onClick}
+        size="sm"
+        variant="secondary"
       >
-        Open
-        <ChevronDown className="size-3.5 text-fd-muted-foreground" />
-      </PopoverTrigger>
-      <PopoverContent className="flex flex-col">
-        {items.map((item) => (
+        {checked ? <Check /> : <Copy />}
+        Copy Page
+      </Button>
+      <ButtonGroupSeparator className="h-7" />
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            aria-label="Open page actions"
+            variant="secondary"
+            size="sm"
+          >
+            <ChevronDown className="size-3.5 text-muted-foreground" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="flex flex-col gap-1">
+          <button
+            type="button"
+            onClick={async () => {
+              if (typeof window === "undefined") return;
+              await copyText(window.location.href);
+              setLinkCopied(true);
+              window.setTimeout(() => setLinkCopied(false), 1500);
+            }}
+            className="text-sm p-2 rounded-lg inline-flex items-center gap-2 hover:text-fd-accent-foreground hover:bg-fd-accent [&_svg]:size-4"
+          >
+            {linkCopied ? <Check /> : <Copy />}
+            Copy Link
+          </button>
           <a
-            key={item.href}
-            href={item.href}
+            href={markdownUrl}
             rel="noreferrer noopener"
             target="_blank"
             className="text-sm p-2 rounded-lg inline-flex items-center gap-2 hover:text-fd-accent-foreground hover:bg-fd-accent [&_svg]:size-4"
           >
-            {item.icon}
-            {item.title}
+            <FileText />
+            View as Markdown
             <ExternalLinkIcon className="text-fd-muted-foreground size-3.5 ms-auto" />
           </a>
-        ))}
-      </PopoverContent>
-    </Popover>
+          {items.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              rel="noreferrer noopener"
+              target="_blank"
+              className="text-sm p-2 rounded-lg inline-flex items-center gap-2 hover:text-fd-accent-foreground hover:bg-fd-accent [&_svg]:size-4"
+            >
+              {item.icon}
+              {item.title}
+              <ExternalLinkIcon className="text-fd-muted-foreground size-3.5 ms-auto" />
+            </a>
+          ))}
+        </PopoverContent>
+      </Popover>
+    </ButtonGroup>
   );
 }

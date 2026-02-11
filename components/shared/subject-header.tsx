@@ -7,7 +7,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { Link } from "next-view-transitions";
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
 
 import { cn, formatSubject } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ interface SubjectHeaderProps {
   subject: string;
   title?: string;
   backHref: string;
+  actions?: ReactNode;
   metadata?: {
     midtermCount: number;
     finalCount: number;
@@ -72,6 +73,7 @@ const SubjectHeader: FC<SubjectHeaderProps> = ({
   subject,
   title,
   backHref,
+  actions,
   metadata,
   contentMeta,
 }) => {
@@ -89,14 +91,17 @@ const SubjectHeader: FC<SubjectHeaderProps> = ({
 
   return (
     <header className="border-b pb-6">
-      <Link
-        href={backHref}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
-        aria-label="Go back"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Back
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <Link
+          href={backHref}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Back
+        </Link>
+        {actions ? <div className="shrink-0">{actions}</div> : null}
+      </div>
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-1">

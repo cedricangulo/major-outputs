@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ViewOptions } from "@/components/ai/page-actions";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { SubjectHeader } from "@/components/shared/subject-header";
 import { getSource, validSubjects } from "@/lib/source";
@@ -37,6 +38,11 @@ const OutputPage = async ({ params }: Props) => {
   const MDX = page.data.body;
   const frontmatter = page.data as Frontmatter;
   const { description, difficulty, files } = frontmatter;
+  const filePath = `${subject}/${output}.mdx`;
+  const githubUrl =
+    `https://github.com/cedricangulo/major-outputs/blob/main/content/${filePath}`;
+  const markdownUrl =
+    `https://raw.githubusercontent.com/cedricangulo/major-outputs/main/content/${filePath}`;
 
   return (
     <PageWrapper>
@@ -44,6 +50,12 @@ const OutputPage = async ({ params }: Props) => {
         subject={subject}
         title={page.data.title}
         backHref={`/${subject}`}
+        actions={
+          <ViewOptions
+            markdownUrl={markdownUrl}
+            githubUrl={githubUrl}
+          />
+        }
         contentMeta={{
           description,
           difficulty,

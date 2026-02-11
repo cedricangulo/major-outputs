@@ -12,10 +12,8 @@
     "format": "biome format --write"
   },
   "dependencies": {
-    "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
-    "@radix-ui/react-tabs": "^1.1.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "16.4.9",
@@ -26,6 +24,7 @@
     "next": "16.1.6",
     "next-themes": "^0.4.6",
     "next-view-transitions": "^0.3.5",
+    "radix-ui": "latest",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "tailwind-merge": "^3.4.0",
