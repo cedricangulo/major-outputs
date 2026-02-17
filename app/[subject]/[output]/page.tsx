@@ -23,6 +23,8 @@ interface Props {
     output: string;
   }>;
 }
+export const dynamic = "force-dynamic";
+
 const OutputPage = async ({ params }: Props) => {
   const { subject, output } = await params;
   const source = getSource(subject);
