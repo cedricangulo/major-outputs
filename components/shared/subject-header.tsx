@@ -30,6 +30,7 @@ interface SubjectHeaderProps {
     url?: string;
     contentType?: ContentType;
   };
+  visitNode?: ReactNode;
 }
 
 type ContentType = "laboratory" | "exercise" | "case-study" | "default";
@@ -76,6 +77,7 @@ const SubjectHeader: FC<SubjectHeaderProps> = ({
   actions,
   metadata,
   contentMeta,
+  visitNode,
 }) => {
   const fullSubjectName = subjectFullNames[formatSubject(subject)];
   const { difficulty, files, url, contentType } = contentMeta ?? {};
@@ -86,7 +88,10 @@ const SubjectHeader: FC<SubjectHeaderProps> = ({
     : null;
   const ContentIcon = contentTypeDetails?.icon;
   const showContentMeta = Boolean(
-    difficulty || contentTypeDetails || (files !== undefined && files > 0),
+    difficulty ||
+      contentTypeDetails ||
+      (files !== undefined && files > 0) ||
+      visitNode,
   );
 
   return (
@@ -176,6 +181,8 @@ const SubjectHeader: FC<SubjectHeaderProps> = ({
                     {files} file{files !== 1 ? "s" : ""}
                   </span>
                 )}
+
+                {visitNode}
               </div>
             )}
           </div>

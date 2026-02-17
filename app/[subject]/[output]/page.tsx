@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ViewOptions } from "@/components/ai/page-actions";
+import { VisitTracker } from "@/components/shared/visit-tracker";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { SubjectHeader } from "@/components/shared/subject-header";
+import { getVisitCount } from "@/lib/views";
 import { getSource, validSubjects } from "@/lib/source";
 import { formatSubject } from "@/lib/utils";
 import { getMDXComponents } from "@/mdx-components";
@@ -43,6 +45,7 @@ const OutputPage = async ({ params }: Props) => {
     `https://github.com/cedricangulo/major-outputs/blob/main/content/${filePath}`;
   const markdownUrl =
     `https://raw.githubusercontent.com/cedricangulo/major-outputs/main/content/${filePath}`;
+  const visitCount = await getVisitCount(subject, output);
 
   return (
     <PageWrapper>
@@ -50,18 +53,21 @@ const OutputPage = async ({ params }: Props) => {
         subject={subject}
         title={page.data.title}
         backHref={`/${subject}`}
-        actions={
-          <ViewOptions
-            markdownUrl={markdownUrl}
-            githubUrl={githubUrl}
-          />
-        }
+        actions={<ViewOptions markdownUrl={markdownUrl} githubUrl={githubUrl} />}
         contentMeta={{
           description,
           difficulty,
           files,
           url: page.url,
         }}
+        visitNode={
+          <VisitTracker
+            subject={subject}
+            output={output}
+            initialCount={visitCount}
+            className="text-xs"
+          />
+        }
       />
 
       <article className="prose prose-slate dark:prose-invert max-w-none py-8">
@@ -70,8 +76,6 @@ const OutputPage = async ({ params }: Props) => {
     </PageWrapper>
   );
 };
-
-OutputPage.displayName = "OutputPage";
 
 export default OutputPage;
 
