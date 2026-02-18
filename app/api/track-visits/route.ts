@@ -3,6 +3,11 @@ import { Redis } from '@upstash/redis';
 const redis = Redis.fromEnv();
 
 export async function POST(request: Request) {
+  // Only process in production
+  if (process.env.NODE_ENV !== 'production') {
+    return Response.json({ visits: 0 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const subject = searchParams.get('subject');

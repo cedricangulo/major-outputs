@@ -17,7 +17,6 @@ export async function getVisitCount(
     const count = await redis.get<number>(key);
     return count ?? 0;
   } catch (error) {
-    console.error('Failed to fetch visit count:', error);
     return 0;
   }
 }

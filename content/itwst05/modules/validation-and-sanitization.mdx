@@ -1,0 +1,263 @@
+---
+title: Validation and sanitization
+description: Validating and sanitizing user input to prevent common attacks and ensure data integrity.
+---
+
+> The most common kind of attack involves user's supplying **wrong data**
+
+- [x] Application Failure
+- [x] Store Incorrect Data
+- [x] Delete Data in your DB
+- [x] Trigger Exploits
+
+### What to look for?
+
+- Input containing metacharacter
+- Input of the wrong type
+- Too much input
+
+#### Metacharacter
+
+Characters that have special meaning when processed by various parts of your system.
+
+`` ` ! $ ^ & * ( ) ~ [ ] \ | { } ' " ; < > ? - `` 
+
+**Confuse or corrupt** the input, and at worst **permit the injection** of some attacking command or script.
+
+#### Wrong Type
+
+Input values that are of an incorrect data type or invalid format are highly likely to have unintended, and therefore undesirable, effects in your applications.
+
+##### Examples
+
+- Date
+- Non-image file format
+- Filename that has binary data
+
+#### Too much input
+
+- System Crash
+- Truncation
+- Buffer overflow
+
+##### Buffer Overflow
+
+(or buffer overrun) occurs when the volume of data exceeds the storage capacity of the memory buffer. As a result, the program attempting to write the data to the buffer overwrites adjacent memory locations.
+
+###### Possible results of BUFFER OVERFLOW
+
+- An existing variable might be overwritten.
+- A harmless application error might be generated, or the application may crash.
+- An instruction might be overwritten with an instruction that executes uploaded code
+
+### Strategies for validating User input
+
+- Declare variables
+- Allow Only Expected Input
+- Check Input Type, Length, and Format
+
+```php title=index.php
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Example</title>
+  </head>
+  <body>
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" value="Submit">
+    </form>
+    <?php 
+      if(isset($_POST['submit'])) {
+        print_r($_FILES['file']);
+      }
+    ?>
+  </body>
+</html>
+```
+
+```php title=index.php
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+  </head>
+  <body>
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" value="Submit">
+    </form>
+    <?php 
+      if(isset($_POST['submit'])) {
+        $file = $_FILES['file']['name'];
+        $filename = explode('.', $file);
+        $actual_filename = $filename[0];
+        $extension_name = $filename[1];
+        echo $actual_filename . '<br>';
+        echo $extension_name;
+      }
+    ?>
+  </body>
+</html>
+```
+
+```php title=index.php
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+  </head>
+  <body>
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" value="Submit">
+    </form>
+    <?php 
+      if(isset($_POST['submit'])) {
+        $file = $_FILES['file']['name'];
+        $filename = explode('.', $file);
+        $actual_filename = $filename[0];
+        $extension_name = $filename[1];
+        $allowed_extension = array('jpg', 'jpeg', 'png');
+
+        if (in_array($extension_name, $allowed_extension)) {
+          echo "allowed.";
+        } else {
+          echo "not allowed.";
+        }
+
+        // echo $actual_filename . '<br>';
+        // echo $extension_name;
+      }
+    ?>
+  </body>
+</html>
+```
+
+```php title=index.php
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+  </head>
+  <body>
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" name="submit">
+    </form>
+    <?php 
+      if(isset($_POST['submit'])) {
+        $file = $_FILES['file']['name'];
+        $filename = explode(".", $file);
+        $actual_filename = $filename[0];
+        $extension_name = $filename[1];
+        
+        $filename_length_count_character = strlen($actual_filename);
+        if ($filename_length_count_character > 10) {
+          echo "invalid";
+        } else {
+          echo "valid";
+        }
+        
+        $extension_name = $filename[1];
+        
+        $valid_extension = array("jpg", "jpeg", "png", "gif");
+        if (in_array($extension_name, $valid_extension)) {
+          echo "valid file format";
+        } else {
+          echo "invalid file format";
+        }
+      }
+    ?>
+  </body>
+</html>
+```
+### Validate and Sanitize Values
+
+#### Validation
+
+Validation checks if the input meets a set of criteria (such as a string contains no standalone single quotation marks).
+
+##### Ways to validate input (starters)
+
+- `filter_var();`
+- `preg_match();` + `RegEx`
+
+#### Sanitizing
+
+To “**clean**” anything from “**bad things**”
+
+### Sample Input and Output
+
+#### Sample Input injecting HTML element
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLkECoB4BF72WNcboH5wsY6uPMUK9Z4etjdxA3"
+  alt="Sample Input injecting HTML element"
+  width={1017}
+  height={315}
+/>
+
+#### Sample Output (without sanitation)
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLRT1u7LKhLpa8jyW6PHr9KeDnEkNUiYB2g07Z"
+  alt="Sample Output (without sanitation)"
+  width={982}
+  height={377}
+/>
+
+#### Sample Output (with sanitation)
+
+<Image 
+  src="https://11j9kbjs2p.ufs.sh/f/UblXrSiF6MzLtNbaXgVqdJDAw3Im7LOn6P2EQsoux0jkYRhy"
+  alt="Sample Output (with sanitation)"
+  width={978}
+  height={328}
+/>
+
+### Why just disable RIGHT CLICK?
+
+```javascript
+// Disable right click
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+});
+
+document.onkeydown = function(e) {
+  // F12
+  if (event.keyCode == 123) {
+    return false;
+  }
+
+  // Ctrl + Shift + I
+  if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+    return false;
+  }
+
+  // Ctrl + Shift + C
+  if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+    return false;
+  }
+
+  // Ctrl + Shift + J
+  if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+    return false;
+  }
+
+  // Ctrl + U
+  if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+    return false;
+  }
+}
+```
+
+> This document is a summary of the original lesson material. It was organized using an AI tool to help with study and review. While every effort was made to stay accurate to the source, please check your original files for complete details and to avoid potential errors.

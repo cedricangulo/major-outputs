@@ -1,0 +1,61 @@
+---
+title: Server and Database Security (Part 2)
+description: Specific files you need to edit to secure your server and database, .htaccess and php.ini.
+---
+
+### 1. The `.htaccess` File
+
+`.htaccess` (Hypertext Access) is a configuration file used by Apache servers to manage access, redirects, and security settings.
+
+- **How to create it**: Open a text editor (like Notepad or VS Code) and save the file simply as `.htaccess`. Make sure it does not have a `.txt` extension at the end.
+- **Where to put it**:
+  - **Root Folder (`htdocs/`)**: This affects every project on your server.
+  - **Project Folder**: This affects only that specific project (e.g., `htdocs/myproject/`).
+  - **Important Requirement**: For `.htaccess` to work, you must enable `AllowOverride All` in your main Apache config file (`httpd.conf`).
+
+#### Common Commands
+
+Here are the basic commands you will use to control your server:
+
+| Command               | Effect                                                                 |
+|-----------------------|-----------------------------------------------------------------------|
+| **Require all denied**| Blocks everyone from accessing the resource.                         |
+| **Require all granted**| Allows everyone to access the resource.                              |
+| **Options -Indexes**  | Stops users from seeing a list of your files if no `index.php` exists.|
+| **Redirect 301**      | Sends a user from an old page to a new page permanently.              |
+| **Require ip [IP Address]** | Allows access only to a specific IP address (useful for admin panels). |
+
+#### Security Examples
+
+You can use `.htaccess` to block access to sensitive areas:
+
+- **Hide File Lists**: Prevents strangers from browsing your folders.
+  - Command: `Options -Indexes`.
+- **Protect Critical Files**: Stops people from accessing settings files.
+  - Command: Uses `<FilesMatch>` to block access to `.htaccess`, `.htpasswd`, and `config.php`.
+- **Block Backup Files**: Prevents access to database backups or logs.
+  - Command: Blocks extensions like `.sql`, `.bak`, `.ini`, and `.log`.
+- **Disable Scripts in Uploads**: Prevents hackers from uploading and running malicious scripts in your "uploads" folder.
+  - Command: `php_flag engine off` inside the specific directory.
+
+### 2. The php.ini File
+
+**php.ini** is the main configuration file for PHP. It manages settings for security, performance, and how errors are handled.
+
+> **Note**: Whenever you change `php.ini`, you **must restart Apache** (Stop and Start) in the XAMPP Control Panel for changes to take effect.
+
+#### Essential Security Settings
+
+Change these settings in your `php.ini` file to harden your security:
+
+| Setting                  | Recommended Value | Why?                                                                 |
+|--------------------------|-------------------|----------------------------------------------------------------------|
+| **expose_php**           | `Off`            | Hides the PHP version so hackers don't know what you are running.    |
+| **allow_url_fopen**      | `Off`            | Stops the server from opening files from remote (outside) locations. |
+| **display_errors**       | `Off`            | Hides error messages from the public so they don't reveal sensitive info. |
+| **log_errors**           | `On`             | Saves errors to a private log file instead of showing them on screen.|
+| **file_uploads**         | `On`             | Allows files to be uploaded (set to `Off` if your site doesn't need uploads).|
+| **upload_max_filesize**  | `2M` (or lower)  | Limits the size of uploaded files to prevent server overload.        |
+| **session.cookie_httponly** | `1` (True)    | Ensures session cookies are handled securely.                        |
+
+> This document is a summary of the original lesson material. It was organized using an AI tool to help with study and review. While every effort was made to stay accurate to the source, please check your original files for complete details and to avoid potential errors.

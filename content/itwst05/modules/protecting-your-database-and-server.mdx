@@ -1,0 +1,57 @@
+---
+title: Protecting Your Database and Server (Part 1)
+description: Starting and important setup (initial and essential configuration).
+---
+
+### What is a Server?
+
+A **server** is a computer program or device that provides a service to another computer program.
+
+#### Server vs. Personal Computer
+
+| Feature           | Personal Computer                                                                 | Server                                                                                     |
+|-------------------|-----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| **Use Time**      | Not built to run continuously                                                    | Built to run continuously                                                                  |
+| **Storage**       | Consumer disks (HDD or SSD)                                                     | Hot-swappable drives (disks you can replace while running) and RAID (a system using many disks to protect data) |
+| **Processor**     | Intel Core (i5, i7, i9) or AMD Ryzen                                             | Intel Xeon                                                                                |
+| **Software**      | Windows 10/11 or standard Linux                                                 | Windows Server, Red Hat Enterprise Linux, or FreeBSD                                      |
+
+### Databases and Web Tools
+
+- **Database**: A neat collection of organized information stored in a computer system.
+- **DBMS**: A Database Management System (DBMS) is the software used to control a database. Examples include MySQL, Oracle, and MongoDB.
+- **Web Server (Apache)**: Software that shows website content by processing and sending webpages to users.
+- **PHP**: A coding language (scripting language) used for web development that fits inside HTML.
+- **XAMPP**: A tool that includes Apache, MariaDB, PHP, and Perl.
+- **MariaDB**: A database that works just like MySQL but is slightly faster for searching and copying data.
+
+### Important Server Settings (php.ini)
+
+Changing these settings helps keep your server safe.
+
+| Setting              | Default | New Security Setup                                |
+|----------------------|---------|---------------------------------------------------|
+| display_errors       | On      | Off (hides code errors from users)                |
+| expose_php           | On      | Off (hides that you are using PHP)                |
+| allow_url_fopen      | On      | Off (stops the server from opening outside links) |
+| memory_limit         |         | (limits the memory a script can use)              |
+| max_execution_time   |         | (stops scripts if they run too long)              |
+
+### Using .htaccess for Control
+
+The **.htaccess** file handles specific tasks for your website:
+
+- Moving users to a different page (redirecting).
+- Blocking users by their IP (Internet Protocol address).
+- Making website addresses (URLs) look cleaner.
+
+#### URL Cleaning Example
+
+You can use a command (directive) called `RewriteRule` to hide file endings:
+
+- `RewriteEngine On`: Turns on the tool that changes URLs.
+- `RewriteCond %{REQUEST_FILENAME} !-f`: Checks if the requested name is not a real file.
+- `^([^\.]+)$`: A pattern that looks for text without a period.
+- `$1.php`: Adds ".php" to the end of the web address automatically.
+
+> This document is a summary of the original lesson material. It was organized using an AI tool to help with study and review. While every effort was made to stay accurate to the source, please check your original files for complete details and to avoid potential errors.

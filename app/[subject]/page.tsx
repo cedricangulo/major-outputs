@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
+
 import { subjectFullNames } from "@/components/shared/course-section";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { SubjectHeader } from "@/components/shared/subject-header";
-import { getSource } from "@/lib/source";
+import { getModules, getSource } from "@/lib/source";
 import { formatSubject } from "@/lib/utils";
 
 // Dynamically import LabCard to reduce initial bundle size
@@ -27,6 +28,17 @@ const LabCard = dynamic(
         <div className="mt-1 h-3 bg-muted rounded w-3/4"></div>
       </div>
     ),
+  },
+);
+
+// Dynamically import ModulesList to reduce initial bundle size
+const ModulesList = dynamic(
+  () =>
+    import("@/components/shared/modules-list").then((mod) => ({
+      default: mod.ModulesList,
+    })),
+  {
+    loading: () => null,
   },
 );
 
@@ -73,6 +85,9 @@ export default async function Page({ params }: Props) {
     finalLabs: filteredLabs.filter((lab) => lab.url.includes("/f-")),
   };
 
+  const modulesSource = getModules(subject);
+  const modulesPages = modulesSource?.getPages() || [];
+
   const metadata = {
     midtermCount: labCategories.midtermLabs.length,
     finalCount: labCategories.finalLabs.length,
@@ -116,9 +131,6 @@ export default async function Page({ params }: Props) {
                         difficulty={frontmatter.difficulty}
                         contentType={detectContentType(lab.url)}
                         fileCount={frontmatter.files}
-                        category={
-                          category === "midtermLabs" ? "midterm" : "final"
-                        }
                       />
                     );
                   })}
@@ -131,6 +143,15 @@ export default async function Page({ params }: Props) {
             </section>
           );
         })}
+
+        {/* Modules section */}
+        <ModulesList
+          modules={modulesPages.map((module) => ({
+            title: module.data.title,
+            url: module.url,
+            description: module.data.description,
+          }))}
+        />
       </main>
     </PageWrapper>
   );

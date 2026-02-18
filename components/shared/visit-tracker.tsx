@@ -19,10 +19,15 @@ export function VisitTracker({
   className,
 }: VisitTrackerProps) {
   useEffect(() => {
+    // Only track visits in production
+    if (process.env.NODE_ENV !== 'production') {
+      return;
+    }
+
     fetch(`/api/track-visits?subject=${encodeURIComponent(subject)}&output=${encodeURIComponent(output)}`, {
       method: 'POST',
     }).catch((error) => {
-      console.error('Failed to track visit:', error);
+      console.warn('Failed to track visit:', error);
     });
   }, [subject, output]);
 
