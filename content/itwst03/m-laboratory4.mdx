@@ -1,0 +1,144 @@
+---
+title: Laboratory 4
+description: Create a user profile form with conditional logic for name formatting, address validation, and age eligibility checks
+difficulty: medium
+files: 1
+---
+
+#### Task
+
+1. Full name is Lastname(required), Firstname(required), MI
+2. if the sex is male, append 'mr' to the Fullname, else append 'ms'
+3. If the address is not Cabanatuan City, display "you are not from Cabanatuan City"
+4. If the age is not greater than 18, display "you are not eligible to become a varsity"
+
+#### Code
+
+```php title="index.php"
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Laboratory 3</title>
+</head>
+
+<body>
+  <main class="min-h-screen bg-slate-100 py-10 px-4">
+    <div class="mx-auto w-full max-w-5xl grid gap-8 lg:grid-cols-2">
+      <section class="rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 p-6 md:p-8">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800">Laboratory 4</h1>
+        <p class="mt-2 text-slate-600">Fill in your details and submit to view the result.</p>
+
+        <form method="GET" class="mt-8 space-y-5">
+          <div>
+            <label for="firstname" class="block text-sm font-semibold text-slate-700">First Name</label>
+            <input id="firstname" type="text" name="firstname" required max="32" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200" />
+          </div>
+
+          <div>
+            <label for="middlename" class="block text-sm font-semibold text-slate-700">Middle Name</label>
+            <input id="middlename" type="text" name="middlename" max="32" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200" />
+          </div>
+
+          <div>
+            <label for="lastname" class="block text-sm font-semibold text-slate-700">Last Name</label>
+            <input id="lastname" type="text" name="lastname" required max="32" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200" />
+          </div>
+
+          <div>
+            <label for="sex" class="block text-sm font-semibold text-slate-700">Sex</label>
+            <select id="sex" name="sex" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200">
+              <option value="" disabled selected>Select sex</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="birthday" class="block text-sm font-semibold text-slate-700">Birthday</label>
+            <input id="birthday" type="date" name="birthday" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200" />
+          </div>
+
+          <div>
+            <label for="address" class="block text-sm font-semibold text-slate-700">Address</label>
+            <input id="address" type="text" name="address" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200" />
+          </div>
+
+          <div>
+            <label for="school" class="block text-sm font-semibold text-slate-700">School</label>
+            <input id="school" type="text" name="school" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200" />
+          </div>
+
+          <div>
+            <label for="schooladdress" class="block text-sm font-semibold text-slate-700">School Address</label>
+            <input id="schooladdress" type="text" name="schooladdress" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200" />
+          </div>
+
+          <button type="submit" name="submit" class="w-full rounded-lg bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2">
+            Submit
+          </button>
+        </form>
+      </section>
+
+      <section class="rounded-2xl bg-slate-900 text-slate-100 shadow-xl ring-1 ring-slate-800 p-6 md:p-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-center">Welcome to the laboratory 4</h2>
+        <div class="mt-6 flex flex-col items-center justify-center gap-3 text-center">
+          <?php
+          if (isset($_GET['submit'])) {
+
+            $firstname = $_GET['firstname'];
+            $lastname = $_GET['lastname'];
+            $middlename = isset($_GET['middlename']) ? $_GET['middlename'] : '';
+            $sex = isset($_GET['sex']) ? $_GET['sex'] : '';
+            $birthday = isset($_GET['birthday']) ? $_GET['birthday'] : '';
+            $address = isset($_GET['address']) ? $_GET['address'] : '';
+            $school = isset($_GET['school']) ? $_GET['school'] : '';
+            $schooladdress = isset($_GET['schooladdress']) ? $_GET['schooladdress'] : '';
+            $age = null;
+
+            if (!empty($birthday)) {
+              // Convert the birthday to a DateTime object
+              $birthDate = DateTime::createFromFormat('Y-m-d', $birthday);
+              // Calculate the age
+              if ($birthDate !== false) {
+                $today = new DateTime('today');
+                // Calculate the age difference
+                // The y property returns the number of years
+                $age = $birthDate->diff($today)->y;
+              }
+            }
+
+            if ($firstname && $lastname) {
+              if ($sex == 'Male') {
+                echo "<h1 class='text-2xl md:text-3xl font-bold text-sky-300'>Mr. $lastname, $firstname $middlename</h1>";
+              } else {
+                echo "<h1 class='text-2xl md:text-3xl font-bold text-sky-300'>Ms. $lastname, $firstname $middlename</h1>";
+              }
+
+              // Check if address is Cabanatuan City
+              if ($address == 'Cabanatuan City') {
+                echo "<h1 class='text-lg font-semibold text-emerald-300'>You are from Cabanatuan City</h1>";
+              } else {
+                echo "<h1 class='text-lg font-semibold text-amber-300'>You are not from Cabanatuan City</h1>";
+              }
+
+              // Check if age is calculated and greater than 18
+              if ($age !== null && $age > 18) {
+                echo "<h1 class='text-lg font-semibold text-emerald-300'>You are eligible to become a varsity</h1>";
+              } else {
+                echo "<h1 class='text-lg font-semibold text-rose-300'>You are not eligible to become a varsity</h1>";
+              }
+            }
+          }
+          ?>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+
+</html>
+```
