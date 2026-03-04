@@ -1,0 +1,74 @@
+---
+title: Laboratory 2
+description: Validate a URL using filter_var().
+difficulty: easy
+files: 1
+---
+
+#### General Instructions
+
+- Create `[fullname].php`.
+- Output must display VALID or INVALID OR sanitized result if required.
+
+There were six different types of tasks, and I was assigned to task #5.
+
+| No | Task                               | Requirements                                                 |
+|----|------------------------------------|--------------------------------------------------------------|
+| 1  | Full name validation (basic regex) | Only letters, spaces, and hyphens allowed                    |
+|    |                                    | Required                                                     |
+|    |                                    | Use `preg_match`                                             |
+| 2  | Email validation (`filter_var`)    | Use HTML type email                                          |
+|    |                                    | Use PHP `filter_var`                                         |
+|    |                                    | If valid, display "Valid email"; if not, "Invalid email"     |
+| 3  | Username validation                | Must be 5-15 characters                                      |
+|    |                                    | Letters and numbers only                                     |
+|    |                                    | No spaces                                                    |
+| 4  | Comment box (XSS Prevention)       | Textarea input                                               |
+|    |                                    | Must sanitize (allow codes as input)                         |
+|    |                                    | Display the output with no formatting or triggering code     |
+| 5  | URL Validation                     | Use `filter_var()`                                           |
+|    |                                    | Must start with `http` or `https`                            |
+| 6  | Student ID format                  | 4 numbers-6 numbers + uppercase letters                      |
+|    |                                    | Example: `1234-1234AB`                                       |
+
+#### Tasks
+
+- Using `filter_var()`.
+- Must start in `http` or `https`.
+
+#### Code
+
+```php title="cedric_bryan_m_angulo.php"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratory 2</title>
+</head>
+
+<body>
+  <form method="POST">
+    <label for="urlInput">Enter a URL:</label>
+    <input type="text" id="urlInput" name="url" required />
+    <input type="submit" value="Submit" name="validate_url" />
+  </form>
+
+  <?php
+  if (isset($_POST['validate_url'])) {
+
+    $url = $_POST['url'];
+
+    if (filter_var($url, FILTER_VALIDATE_URL)) {
+      echo "<p style='color: green;'>Valid URL: <a href='$url' target='_blank'>$url</a></p>";
+    } else {
+      echo "<p style='color: red;'>Invalid URL.</p>";
+    }
+  }
+  ?>
+</body>
+
+</html>
+```
+
+I got 95 because I forgot to use url as the input type.
