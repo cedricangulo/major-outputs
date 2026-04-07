@@ -1,0 +1,1584 @@
+---
+title: Case Problem 1
+description: Build an inventory management system with multi-table MySQL schema, tabbed views, and CRUD form handlers in PHP
+difficulty: hard
+files: 19
+---
+
+#### Problem
+
+Develop a multi-table inventory management system that tracks suppliers, categories, products, and inventory batches.
+
+1. Implement add and list operations for each table.
+2. Use prepared statements for database queries.
+3. Validate user input in HTML forms and backend handlers.
+4. Organize the project with controllers, models, and views.
+5. Render a Mermaid ER diagram for table relationships.
+6. Provide SQL scripts for setup, sample data, and table reset.
+
+---
+
+#### file structure
+
+<Files className="mt-4">
+  <Folder name="case-1" defaultOpen>
+    <Folder name="app" defaultOpen>
+      <Folder name="controllers" defaultOpen>
+        <File name="add_supplier.php" />
+        <File name="add_category.php" />
+        <File name="add_product.php" />
+        <File name="add_batch.php" />
+      </Folder>
+      <Folder name="models" defaultOpen>
+        <File name="db.php" />
+        <File name="get_suppliers.php" />
+        <File name="get_categories.php" />
+        <File name="get_products.php" />
+        <File name="get_batches.php" />
+      </Folder>
+      <Folder name="views" defaultOpen>
+        <File name="suppliers.php" />
+        <File name="categories.php" />
+        <File name="products.php" />
+        <File name="batches.php" />
+        <File name="mermaid.php" />
+      </Folder>
+    </Folder>
+    <Folder name="database" defaultOpen>
+      <File name="database_setup.sql" />
+      <File name="hardware_store_seeder.sql" />
+      <File name="reset_tables.sql" />
+    </Folder>
+    <Folder name="public" defaultOpen>
+      <Folder name="assets" defaultOpen>
+        <Folder name="css" defaultOpen>
+          <File name="global.css" />
+        </Folder>
+      </Folder>
+      <File name="index.php" />
+    </Folder>
+  </Folder>
+</Files>
+
+---
+
+#### code
+
+##### public files
+
+<Tabs items={['index.php', 'global.css']}>
+<Tab value="index.php">
+
+```php title="public/index.php"
+<?php
+// Database connection and data fetching
+require_once '../app/models/db.php';
+require_once '../app/models/get_suppliers.php';
+require_once '../app/models/get_categories.php';
+require_once '../app/models/get_products.php';
+require_once '../app/models/get_batches.php';
+
+// Detect active tab from GET parameter
+// Can be isset($_GET['view']) ? $_GET['view'] : 'suppliers' but null coalescing operator is cleaner
+$view = $_GET['view'] ?? 'suppliers'; // ?view=value
+
+// Load the data.
+$suppliers = getSuppliers();
+$categories = getCategories();
+$products = getProducts();
+$batches = getBatches();
+
+// Get status message from GET params
+$status = $_GET['status'] ?? null;
+$message = $_GET['message'] ?? null;
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Problem #1 - Inventory Management System</title>
+  <link rel="icon" href="https://www.google.com/s2/favicons?domain=https://ca-resources.vercel.app&sz=64" type="image/png">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- Basecoat UI CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/basecoat.cdn.min.css">
+
+  <!-- Basecoat UI JavaScript (for Dialog and Toast components) -->
+  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/js/all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/js/toast.min.js" defer></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/css/global.css">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
+
+  <!-- Theme Switcher -->
+  <!-- From Tailwindcss: https://tailwindcss.com/docs/dark-mode#with-system-theme-support -->
+  <script>
+    // On page load or when changing themes, apply the dark class if needed
+    document.documentElement.classList.toggle(
+      'dark',
+      localStorage.theme === 'dark' ||
+      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
+
+    // Listen for theme toggle events from Basecoat
+    document.addEventListener('basecoat:theme', e => {
+      const html = document.documentElement;
+      const isDarkNow = html.classList.contains('dark');
+      const willBeDark = !isDarkNow;
+
+      // Update DOM
+      html.classList.toggle('dark', willBeDark);
+
+      // Persist preference
+      try {
+        localStorage.theme = willBeDark ? 'dark' : 'light';
+      } catch {}
+    });
+  </script>
+
+</head>
+
+<body class="relative p-8 space-y-8 h-dvh">
+  <!-- ================= BACKGROUND GRADIENT ================= -->
+  <div class="absolute top-0 left-0 w-full h-1/4 bg-linear-to-b -z-10 from-[#fa7d002c] to-transparent"></div>
+
+  <!-- ================= TOASTER CONTAINER ================= -->
+  <div id="toaster" class="toaster"></div>
+
+  <!-- Toast notification from PHP status messages -->
+  <!-- Documentation: https://basecoat-css.netlify.app/components/toast -->
+  <?php if ($status && $message): ?>
+    <script>
+      const toaster = document.getElementById('toaster');
+
+      if (toaster) {
+        toaster.addEventListener('basecoat:initialized', function() {
+          document.dispatchEvent(new CustomEvent('basecoat:toast', {
+            detail: {
+              config: {
+                category: <?php echo json_encode(($status === 'success') ? 'success' : 'error'); ?>,
+                title: <?php echo json_encode(($status === 'success') ? 'Success' : 'Error'); ?>,
+                description: <?php echo json_encode($message); ?>,
+                cancel: {
+                  label: 'Dismiss'
+                }
+              }
+            }
+          }));
+        }, {
+          once: true
+        });
+      }
+    </script>
+  <?php endif; ?>
+
+  <!-- ================= HEADER ================= -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-4xl font-bold">Inventory Management System</h1>
+      <p class="text-muted-foreground">Case Problem #1: Multi-Table Database Design</p>
+    </div>
+    <!-- ================= THEME TOGGLE ================= -->
+    <button
+      type="button"
+      aria-label="Toggle dark mode"
+      data-side="bottom"
+      onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))"
+      class="btn-icon-outline size-8">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+        <path d="M12 3l0 18"></path>
+        <path d="M12 9l4.65 -4.65"></path>
+        <path d="M12 14.3l7.37 -7.37"></path>
+        <path d="M12 19.6l8.85 -8.85"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ================= DATA GRIDS - TABBED INTERFACE ================= -->
+  <div class="w-full tabs" id="data-grids-tabs">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <!-- ================= TAB NAVIGATION ================= -->
+      <nav role="tablist" aria-orientation="horizontal" class="w-fit">
+        <!-- sample render:               <a href="?view=suppliers" role="tab" aria-selected="true" class="active">Suppliers</a> -->
+        <!-- tertiary if/else structure:  condition ? value_if_true : value_if_false -->
+        <a href="?view=suppliers" role="tab" aria-selected="<?php echo $view === 'suppliers' ? 'true' : 'false'; ?>" <?php echo $view === 'suppliers' ? 'class="active"' : ''; ?>>Suppliers</a>
+        <a href="?view=categories" role="tab" aria-selected="<?php echo $view === 'categories' ? 'true' : 'false'; ?>" <?php echo $view === 'categories' ? 'class="active"' : ''; ?>>Categories</a>
+        <a href="?view=products" role="tab" aria-selected="<?php echo $view === 'products' ? 'true' : 'false'; ?>" <?php echo $view === 'products' ? 'class="active"' : ''; ?>>Products</a>
+        <a href="?view=batches" role="tab" aria-selected="<?php echo $view === 'batches' ? 'true' : 'false'; ?>" <?php echo $view === 'batches' ? 'class="active"' : ''; ?>>Batches</a>
+      </nav>
+
+      <!-- ================= ACTION BUTTONS ================= -->
+      <div class="flex items-center gap-2">
+        <?php if ($view === 'suppliers'): ?>
+          <button type="button" onclick="document.getElementById('dialog-add-supplier').showModal()" class="btn-sm">
+            <i data-lucide="plus" class="size-4"></i> Add Supplier
+          </button>
+        <?php elseif ($view === 'categories'): ?>
+          <button type="button" onclick="document.getElementById('dialog-add-category').showModal()" class="btn-sm">
+            <i data-lucide="plus" class="size-4"></i> Add Category
+          </button>
+        <?php elseif ($view === 'products'): ?>
+          <button type="button" onclick="document.getElementById('dialog-add-product').showModal()" class="btn-sm">
+            <i data-lucide="plus" class="size-4"></i> Add Product
+          </button>
+        <?php elseif ($view === 'batches'): ?>
+          <button type="button" onclick="document.getElementById('dialog-add-batch').showModal()" class="btn-sm">
+            <i data-lucide="plus" class="size-4"></i> Add Batch
+          </button>
+        <?php endif; ?>
+        <a href="?view=mermaid" class="btn-secondary">
+          <i data-lucide="workflow" class="size-4"></i>
+          <span>View Relationships</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ================= Dynamic Tab Panel ================= -->
+    <div role="tabpanel" aria-selected="true">
+      <div class="overflow-x-auto">
+        <!-- Content for each view will be included here -->
+        <?php switch ($view):
+          case 'suppliers':
+            include '../app/views/suppliers.php';
+            break;
+          case 'categories':
+            include '../app/views/categories.php';
+            break;
+          case 'products':
+            include '../app/views/products.php';
+            break;
+          case 'batches':
+            include '../app/views/batches.php';
+            break;
+          case 'mermaid':
+            include '../app/views/mermaid.php';
+            break;
+          default:
+            echo '<div class="flex flex-col items-center justify-center flex-1 min-w-0 gap-6 p-6 text-center border-dashed rounded-lg text-balance md:p-12">
+                    <header class="flex flex-col items-center max-w-sm gap-2 text-center">
+                      <h3 class="text-lg font-medium tracking-tight">404</h3>
+                      <p class="text-muted-foreground text-sm/relaxed">The requested page was not found.</p>
+                    </header>
+                  </div>';
+        endswitch; ?>
+      </div>
+    </div>
+  </div>
+
+  <!-- Close Database Connection -->
+  <?php $conn->close(); ?>
+
+</body>
+
+</html>
+```
+
+</Tab>
+<Tab value="global.css">
+
+```css title="public/assets/css/global.css"
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #fafafa;
+  --card-foreground: #1f1f1f;
+  --popover: #fdfdfc;
+  --popover-foreground: #1f1f1f;
+  --primary: #fa7d00;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #262626;
+  --muted: #f5f5f5;
+  --muted-foreground: #595959;
+  --accent: #fef3e7;
+  --accent-foreground: #b35900;
+  --destructive: #e7000b;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #dcd9d0;
+  --ring: #fa7d00;
+  --chart-1: #91c5ff;
+  --chart-2: #fa7d00;
+  --chart-3: #308ce8;
+  --chart-4: #e14747;
+  --chart-5: #34b25e;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #fa7d00;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fef3e7;
+  --sidebar-accent-foreground: #b35900;
+  --sidebar-border: #d8d5ca;
+  --sidebar-ring: #fa7d00;
+  --font-sans: Plus Jakarta Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: Bricolage Grotesque, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: Anonymous Pro, ui-monospace, monospace;
+  --radius: 0rem;
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #000000;
+  --shadow-2xs: 0 1px 0px 0px hsl(0 0% 0% / 0.00);
+  --shadow-xs: 0 1px 0px 0px hsl(0 0% 0% / 0.00);
+  --shadow-sm: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 1px 2px -1px hsl(0 0% 0% / 0.00);
+  --shadow: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 1px 2px -1px hsl(0 0% 0% / 0.00);
+  --shadow-md: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 2px 4px -1px hsl(0 0% 0% / 0.00);
+  --shadow-lg: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 4px 6px -1px hsl(0 0% 0% / 0.00);
+  --shadow-xl: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 8px 10px -1px hsl(0 0% 0% / 0.00);
+  --shadow-2xl: 0 1px 0px 0px hsl(0 0% 0% / 0.00);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ebebeb;
+  --card: #050505;
+  --card-foreground: #ebebeb;
+  --popover: #1a1a1a;
+  --popover-foreground: #ebebeb;
+  --primary: #ff9933;
+  --primary-foreground: #2e1700;
+  --secondary: #262626;
+  --secondary-foreground: #ebebeb;
+  --muted: #262626;
+  --muted-foreground: #999999;
+  --accent: #331f0a;
+  --accent-foreground: #fa7d00;
+  --destructive: #ff2e2e;
+  --destructive-foreground: #ffffff;
+  --border: #212121;
+  --input: #383838;
+  --ring: #fa7d00;
+  --chart-1: #fa7d00;
+  --chart-2: #33e680;
+  --chart-3: #4999e9;
+  --chart-4: #f015f4;
+  --chart-5: #97b234;
+  --sidebar: #121212;
+  --sidebar-foreground: #ebebeb;
+  --sidebar-primary: #fa7d00;
+  --sidebar-primary-foreground: #2e1700;
+  --sidebar-accent: #331f0a;
+  --sidebar-accent-foreground: #fa7d00;
+  --sidebar-border: #2e2e2e;
+  --sidebar-ring: #fa7d00;
+  --font-sans: Plus Jakarta Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: Bricolage Grotesque, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: Anonymous Pro, ui-monospace, monospace;
+  --radius: 0rem;
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #000000;
+  --shadow-2xs: 0 1px 0px 0px hsl(0 0% 0% / 0.00);
+  --shadow-xs: 0 1px 0px 0px hsl(0 0% 0% / 0.00);
+  --shadow-sm: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 1px 2px -1px hsl(0 0% 0% / 0.00);
+  --shadow: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 1px 2px -1px hsl(0 0% 0% / 0.00);
+  --shadow-md: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 2px 4px -1px hsl(0 0% 0% / 0.00);
+  --shadow-lg: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 4px 6px -1px hsl(0 0% 0% / 0.00);
+  --shadow-xl: 0 1px 0px 0px hsl(0 0% 0% / 0.00), 0 8px 10px -1px hsl(0 0% 0% / 0.00);
+  --shadow-2xl: 0 1px 0px 0px hsl(0 0% 0% / 0.00);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Tab Navigation Styling */
+nav[role="tablist"] a {
+  @apply px-4 py-2 text-sm font-medium transition-colors cursor-pointer rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground;
+}
+
+nav[role="tablist"] a[aria-selected="true"],
+nav[role="tablist"] a.active {
+  @apply border-accent text-foreground font-semibold;
+}
+
+nav[role="tablist"] a[aria-selected="false"] {
+  @apply hover:border-border;
+}
+```
+
+</Tab>
+</Tabs>
+
+##### controllers
+
+<Tabs items={['add_supplier.php', 'add_category.php', 'add_product.php', 'add_batch.php']}>
+<Tab value="add_supplier.php">
+
+```php title="app/controllers/add_supplier.php"
+<?php
+// Add Supplier - POST handler
+require_once '../models/db.php';
+
+// Get POST data
+$name = $_POST['name'] ?? '';
+$contact_person = $_POST['contact_person'] ?? '';
+$phone = $_POST['phone'] ?? '';
+
+// Validate
+if (empty($name)) {
+  header('Location: ../../public/index.php?view=suppliers&status=error&message=' . urlencode('Supplier name is required'));
+  exit();
+}
+
+// Insert using prepared statement
+$stmt = $conn->prepare("INSERT INTO suppliers (name, contact_person, phone) VALUES (?, ?, ?)");
+if (!$stmt) {
+  header('Location: ../../public/index.php?view=suppliers&status=error&message=' . urlencode('Database error: ' . $conn->error));
+  exit();
+}
+
+// Bind parameters and execute
+$stmt->bind_param("sss", $name, $contact_person, $phone);
+
+// Execute and check for success
+if ($stmt->execute()) {
+  header('Location: ../../public/index.php?view=suppliers&status=success&message=' . urlencode('Supplier added successfully'));
+} else {
+  header('Location: ../../public/index.php?view=suppliers&status=error&message=' . urlencode('Error adding supplier: ' . $stmt->error));
+}
+
+// Close connections
+$stmt->close();
+$conn->close();
+exit();
+```
+
+</Tab>
+<Tab value="add_category.php">
+
+```php title="app/controllers/add_category.php"
+<?php
+// Add Category - POST handler
+require_once '../models/db.php';
+
+// Get POST data
+$name = $_POST['name'] ?? '';
+
+// Validate
+if (empty($name)) {
+  header('Location: ../../public/index.php?view=categories&status=error&message=' . urlencode('Category name is required'));
+  exit();
+}
+
+// Insert using prepared statement
+$stmt = $conn->prepare("INSERT INTO categories (name) VALUES (?)");
+
+// Check if prepare was successful
+if (!$stmt) {
+  header('Location: ../../public/index.php?view=categories&status=error&message=' . urlencode('Database error: ' . $conn->error));
+  exit();
+}
+
+// Bind parameters and execute
+$stmt->bind_param("s", $name);
+// * s : String (Most common: names, dates, descriptions, etc.)
+// * i : Integer (Whole numbers: IDs, quantities, ages)
+// * d : Double (Decimal numbers: prices, weights, coordinates)
+// * b : Blob (Binary data: images, PDFs-rarely used this way)
+
+// Execute and check for success
+if ($stmt->execute()) {
+  header('Location: ../../public/index.php?view=categories&status=success&message=' . urlencode('Category added successfully'));
+} else {
+  header('Location: ../../public/index.php?view=categories&status=error&message=' . urlencode('Error adding category: ' . $stmt->error));
+}
+
+// Close connections
+$stmt->close();
+$conn->close();
+// Redirect back to index with status message
+exit();
+```
+
+</Tab>
+<Tab value="add_product.php">
+
+```php title="app/controllers/add_product.php"
+<?php
+// Add Product - POST handler
+require_once '../models/db.php';
+
+$category_id = intval($_POST['category_id'] ?? 0);
+$sku = $_POST['sku'] ?? '';
+$name = $_POST['name'] ?? '';
+$base_unit = $_POST['base_unit'] ?? '';
+$min_stock_level = intval($_POST['min_stock_level'] ?? 0);
+
+// Validate
+if (empty($sku) || empty($name) || $category_id === 0) {
+  header('Location: ../../public/index.php?view=products&status=error&message=' . urlencode('SKU, name, and category are required'));
+  exit();
+}
+
+// Check if SKU already exists
+$check_stmt = $conn->prepare("SELECT id FROM products WHERE sku = ?");
+$check_stmt->bind_param("s", $sku);
+$check_stmt->execute();
+if ($check_stmt->get_result()->num_rows > 0) {
+  header('Location: ../../public/index.php?view=products&status=error&message=' . urlencode('SKU already exists'));
+  exit();
+}
+$check_stmt->close();
+
+// Insert using prepared statement
+$stmt = $conn->prepare("INSERT INTO products (category_id, sku, name, base_unit, min_stock_level) VALUES (?, ?, ?, ?, ?)");
+
+// Check if prepare was successful
+if (!$stmt) {
+  header('Location: ../../public/index.php?view=products&status=error&message=' . urlencode('Database error: ' . $conn->error));
+  exit();
+}
+
+// Bind parameters and execute
+$stmt->bind_param("isssi", $category_id, $sku, $name, $base_unit, $min_stock_level);
+
+// Execute and check for success
+if ($stmt->execute()) {
+  header('Location: ../../public/index.php?view=products&status=success&message=' . urlencode('Product added successfully'));
+} else {
+  header('Location: ../../public/index.php?view=products&status=error&message=' . urlencode('Error adding product: ' . $stmt->error));
+}
+
+// Close connections
+$stmt->close();
+$conn->close();
+exit();
+```
+
+</Tab>
+<Tab value="add_batch.php">
+
+```php title="app/controllers/add_batch.php"
+<?php
+// Add Batch - POST handler
+require_once '../models/db.php';
+
+// Get POST data
+$product_id = intval($_POST['product_id'] ?? 0);
+$supplier_id = intval($_POST['supplier_id'] ?? 0);
+$batch_code = $_POST['batch_code'] ?? '';
+$qty = intval($_POST['qty'] ?? 0);
+
+// Validate
+if ($product_id === 0 || $supplier_id === 0 || $qty === 0) {
+  header('Location: ../../public/index.php?view=batches&status=error&message=' . urlencode('Product, supplier, and quantity are required'));
+  exit();
+}
+
+// Insert using prepared statement
+$stmt = $conn->prepare("INSERT INTO batches (product_id, supplier_id, batch_code, qty) VALUES (?, ?, ?, ?)");
+if (!$stmt) {
+  header('Location: ../../public/index.php?view=batches&status=error&message=' . urlencode('Database error: ' . $conn->error));
+  exit();
+}
+
+// Bind parameters and execute
+$stmt->bind_param("iisi", $product_id, $supplier_id, $batch_code, $qty);
+
+// Execute and check for success
+if ($stmt->execute()) {
+  header('Location: ../../public/index.php?view=batches&status=success&message=' . urlencode('Batch added successfully'));
+} else {
+  header('Location: ../../public/index.php?view=batches&status=error&message=' . urlencode('Error adding batch: ' . $stmt->error));
+}
+
+// Close connections
+$stmt->close();
+$conn->close();
+exit();
+```
+
+</Tab>
+</Tabs>
+
+##### models
+
+<Tabs items={['db.php', 'get_suppliers.php', 'get_categories.php', 'get_products.php', 'get_batches.php']}>
+<Tab value="db.php">
+
+```php title="app/models/db.php"
+<?php
+// Database configuration and connection
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$dbname = 'inventory';
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die('Database connection failed');
+}
+
+// Set charset to avoid issues with special characters
+// Without this, you might encounter issues with characters like emojis or certain symbols
+$conn->set_charset('utf8mb4');
+```
+
+</Tab>
+<Tab value="get_suppliers.php">
+
+```php title="app/models/get_suppliers.php"
+<?php
+// Get Suppliers - Helper function for index.php
+function getSuppliers()
+{
+  // Use global connection
+  global $conn;
+
+  // Fetch suppliers
+  $stmt = $conn->prepare("SELECT id, name, contact_person, phone FROM suppliers ORDER BY name");
+
+  // Check if prepare was successful
+  if (!$stmt) {
+    die("Prepare failed: " . $conn->error);
+  }
+
+  // Execute and fetch results
+  $stmt->execute();
+
+  // Fetch suppliers into an array
+  $result = $stmt->get_result();
+
+  // Store suppliers in an array
+  $suppliers = [];
+
+  // Loop through results and add to suppliers array
+  while ($row = $result->fetch_assoc()) {
+    $suppliers[] = $row;
+  }
+
+  // Associative array example:
+  // $categories = [
+  //   [
+  //     'id' => 1,
+  //     'name' => 'Category A',
+  //     'created_at' => '2024-06-01 12:00:00'
+  //   ],
+  //   [
+  //     'id' => 2,
+  //     'name' => 'Category B',
+  //     'created_at' => '2024-06-01 12:00:00'
+  //   ],
+  // ];
+
+  // how PHP displays the array after it exists in memory.
+  // echo '<pre>';
+  // print_r($categories);
+  // echo '</pre>';
+  // Array
+  //    (
+  //      [0] => Array
+  //        (
+  //          [id] => 1
+  //          [name] => Category A
+  //          [created_at] => 2024-06-01 12:00:00
+  //        )
+  //      [1] => Array
+  //        (
+  //          [id] => 2
+  //          [name] => Category B
+  //          [created_at] => 2024-06-01 12:00:00
+  //        )
+  //    )
+
+  // Close statement and return suppliers
+  $stmt->close();
+
+  // Return suppliers array
+  return $suppliers;
+}
+```
+
+</Tab>
+<Tab value="get_categories.php">
+
+```php title="app/models/get_categories.php"
+<?php
+// Get Categories - Helper function for index.php
+function getCategories()
+{
+  // Use global connection
+  // global keyword allows us to access the $conn variable defined in db.php
+  global $conn;
+
+  // Fetch categories
+  $stmt = $conn->prepare("SELECT * FROM categories ORDER BY created_at DESC");
+
+  // Check if prepare was successful
+  if (!$stmt) {
+    die("Prepare failed: " . $conn->error);
+  }
+
+  // Execute and fetch results
+  $stmt->execute();
+
+  // Fetch categories into an array
+  $result = $stmt->get_result();
+
+  // Store categories in an array
+  $categories = [];
+
+  // Loop through results and add to categories array
+  while ($row = $result->fetch_assoc()) {
+    $categories[] = $row;
+  }
+
+  // Close statement and return categories
+  $stmt->close();
+
+  // Return categories array
+  return $categories;
+}
+```
+
+</Tab>
+<Tab value="get_products.php">
+
+```php title="app/models/get_products.php"
+<?php
+// Get Products - Helper function for index.php
+function getProducts()
+{
+  // Use global connection
+  global $conn;
+
+  // Fetch products with category names
+  $stmt = $conn->prepare("
+    SELECT p.id, p.sku, p.name, p.base_unit, p.min_stock_level, c.name as category_name
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.id
+    ORDER BY p.name
+  ");
+
+  // Check if prepare was successful
+  if (!$stmt) {
+    die("Prepare failed: " . $conn->error);
+  }
+
+  // Execute and fetch results
+  $stmt->execute();
+
+  // Fetch products into an array
+  $result = $stmt->get_result();
+
+  // Store products in an array
+  $products = [];
+
+  // Loop through results and add to products array
+  while ($row = $result->fetch_assoc()) {
+    $products[] = $row;
+  }
+
+  // Close statement and return products
+  $stmt->close();
+
+  // Return products array
+  return $products;
+}
+```
+
+</Tab>
+<Tab value="get_batches.php">
+
+```php title="app/models/get_batches.php"
+<?php
+// Get Batches - Helper function for index.php
+function getBatches()
+{
+  // Use global connection
+  global $conn;
+
+  // Fetch batches with product and supplier names
+  $stmt = $conn->prepare("
+    SELECT b.id, b.product_id, b.supplier_id, b.batch_code, b.qty, b.received_date,
+          p.name as product_name, s.name as supplier_name
+    FROM batches b
+    LEFT JOIN products p ON b.product_id = p.id
+    LEFT JOIN suppliers s ON b.supplier_id = s.id
+    ORDER BY b.received_date DESC
+  ");
+
+  // Check if prepare was successful
+  if (!$stmt) {
+    die("Prepare failed: " . $conn->error);
+  }
+
+  // Execute and fetch results
+  $stmt->execute();
+
+  // Fetch batches into an array
+  $result = $stmt->get_result();
+
+  // Store batches in an array
+  $batches = [];
+
+  // Loop through results and add to batches array
+  while ($row = $result->fetch_assoc()) {
+    $batches[] = $row;
+  }
+
+  // Close statement and return batches
+  $stmt->close();
+
+  // Return batches array
+  return $batches;
+}
+```
+
+</Tab>
+</Tabs>
+
+##### views
+
+<Tabs items={['suppliers.php', 'categories.php', 'products.php', 'batches.php', 'mermaid.php']}>
+<Tab value="suppliers.php">
+
+```php title="app/views/suppliers.php"
+<!--
+Suppliers Table Rendering
+This file is included by index.php based on GET parameter
+Variables available: $suppliers (array of supplier data)
+-->
+
+<?php if (empty($suppliers)): ?>
+  <div class="flex flex-col items-center justify-center flex-1 min-w-0 gap-6 p-6 text-center border-dashed rounded-lg text-balance md:p-12">
+    <header class="flex flex-col items-center max-w-sm gap-2 text-center">
+      <h3 class="text-lg font-medium tracking-tight">No Suppliers</h3>
+      <p class="text-muted-foreground text-sm/relaxed">Create your first supplier to get started.</p>
+    </header>
+  </div>
+<?php else: ?>
+  <table class="table">
+    <caption>Suppliers</caption>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Contact</th>
+        <th>Phone</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($suppliers as $s): ?>
+        <tr>
+          <td><?php echo htmlspecialchars($s['name']); ?></td>
+          <td><?php echo htmlspecialchars($s['contact_person'] ?? '-'); ?></td>
+          <td><?php echo htmlspecialchars($s['phone'] ?? '-'); ?></td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+<?php endif; ?>
+
+<!-- ================= DIALOG: ADD SUPPLIER ================= -->
+<dialog id="dialog-add-supplier" class="dialog w-full sm:max-w-[425px]"
+  aria-labelledby="dialog-supplier-title" aria-describedby="dialog-supplier-desc"
+  onclick="if (event.target === this) this.close()">
+  <div>
+    <header>
+      <h2 id="dialog-supplier-title">Add Supplier</h2>
+      <p id="dialog-supplier-desc">Add a new supplier to your database.</p>
+    </header>
+
+    <!-- Close button as the header -->
+    <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+
+    <section>
+      <form class="grid gap-4 form" method="POST" action="../app/controllers/add_supplier.php" id="form-supplier">
+        <div class="grid gap-3">
+          <label for="supplier-name" class="label">Supplier Name<span class="text-red-500">*</span></label>
+          <input
+            id="supplier-name"
+            type="text"
+            name="name"
+            placeholder="Enter supplier name"
+            required
+            minlength="2"
+            maxlength="100"
+            pattern="^[a-zA-Z0-9\s.\-&]+$"
+            title="Supplier name: Alphanumeric, spaces, dots, hyphens, and ampersands only." />
+        </div>
+
+        <div class="grid gap-3">
+          <label for="supplier-contact" class="label">Contact Person</label>
+          <input
+            class="input"
+            id="supplier-contact"
+            type="text"
+            name="contact_person"
+            placeholder="Enter contact person"
+            maxlength="100"
+            pattern="^[a-zA-Z\s.\-',]*$"
+            title="Contact: Letters, spaces, dots, hyphens, apostrophes, and commas only." />
+        </div>
+
+        <div class="grid gap-3">
+          <label for="supplier-phone" class="label">Phone Number</label>
+          <input
+            class="input"
+            id="supplier-phone"
+            type="tel"
+            name="phone"
+            placeholder="e.g. 09123456789 or +639123456789"
+            pattern="^(\+639|09)\d{9}$"
+            title="Phone: Must start with 09 or +639 followed by 9 digits." />
+        </div>
+      </form>
+    </section>
+
+    <footer>
+      <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+      <button type="submit" form="form-supplier" class="btn">Save Supplier</button>
+    </footer>
+  </div>
+</dialog>
+```
+
+</Tab>
+<Tab value="categories.php">
+
+```php title="app/views/categories.php"
+<!--
+Categories Table Rendering
+This file is included by index.php based on GET parameter
+Variables available: $categories (array of category data)
+-->
+
+<?php if (empty($categories)): ?>
+  <div class="flex flex-col items-center justify-center flex-1 min-w-0 gap-6 p-6 text-center border-dashed rounded-lg text-balance md:p-12">
+    <header class="flex flex-col items-center max-w-sm gap-2 text-center">
+      <h3 class="text-lg font-medium tracking-tight">No Categories</h3>
+      <p class="text-muted-foreground text-sm/relaxed">Create your first category to get started.</p>
+    </header>
+  </div>
+<?php else: ?>
+  <table class="table">
+    <caption>Categories</caption>
+    <thead>
+      <tr>
+        <th>Category Name</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($categories as $category): ?>
+        <tr>
+          <td><?php echo htmlspecialchars($category['name']); ?></td>
+          <!--
+            M: Short textual representation of a month (Jan through Dec).
+            d: Day of the month with leading zeros (01 through 31).
+            Y: Four-digit representation of the year (e.g., 2024).
+            g: 12-hour format of an hour without leading zeros (1 through 12).
+            i: Minutes with leading zeros (00 through 59).
+            A: Uppercase Ante meridiem and Post meridiem (AM or PM).
+          -->
+          <td><?php echo date('M d, Y, g:i A', strtotime($category['created_at'])); ?></td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+<?php endif; ?>
+
+<!-- ================= DIALOG: ADD CATEGORY ================= -->
+<dialog id="dialog-add-category" class="dialog w-full sm:max-w-[425px]"
+  aria-labelledby="dialog-category-title" aria-describedby="dialog-category-desc"
+  onclick="if (event.target === this) this.close()">
+  <!-- if you clicked anywhere except the dialog, close it -->
+  <div>
+    <header>
+      <h2 id="dialog-category-title">Add Category</h2>
+      <p id="dialog-category-desc">Create a new product category.</p>
+    </header>
+
+    <!-- Close button as the header -->
+    <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+
+    <section>
+      <form class="grid gap-4 form" method="POST" action="../app/controllers/add_category.php" id="form-category">
+        <div class="grid gap-3">
+          <label for="category-name" class="label">Category Name<span class="text-red-500">*</span></label>
+          <input
+            class="input"
+            id="category-name"
+            type="text"
+            name="name"
+            placeholder="e.g., Electronics, Office Supplies"
+            required
+            minlength="2"
+            maxlength="50"
+            pattern="^[a-zA-Z0-9\s.\-&/,]+$"
+            title="Category: 2-50 chars. Letters, numbers, spaces, dots, hyphens, ampersands, slashes, and commas only." />
+        </div>
+      </form>
+    </section>
+
+    <footer>
+      <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+      <button type="submit" form="form-category" class="btn">Save Category</button>
+    </footer>
+  </div>
+</dialog>
+```
+
+</Tab>
+<Tab value="products.php">
+
+```php title="app/views/products.php"
+<!--
+Products Table Rendering
+This file is included by index.php based on GET parameter
+Variables available: $products (array of product data)
+-->
+
+<?php if (empty($products)): ?>
+  <div class="flex flex-col items-center justify-center flex-1 min-w-0 gap-6 p-6 text-center border-dashed rounded-lg text-balance md:p-12">
+    <header class="flex flex-col items-center max-w-sm gap-2 text-center">
+      <h3 class="text-lg font-medium tracking-tight">No Products</h3>
+      <p class="text-muted-foreground text-sm/relaxed">Create your first product to get started.</p>
+    </header>
+  </div>
+<?php else: ?>
+  <table class="table">
+    <caption>Products</caption>
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Unit</th>
+        <th>Min Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($products as $p): ?>
+        <tr>
+          <td><?php echo htmlspecialchars($p['sku']); ?></td>
+          <td><?php echo htmlspecialchars($p['name']); ?></td>
+          <td><?php echo htmlspecialchars($p['category_name'] ?? '-'); ?></td>
+          <td><?php echo htmlspecialchars($p['base_unit'] ?? '-'); ?></td>
+          <td><?php echo $p['min_stock_level'] ?? 0; ?></td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+<?php endif; ?>
+
+<!-- ================= DIALOG: ADD PRODUCT ================= -->
+<dialog id="dialog-add-product" class="dialog w-full sm:max-w-[425px]"
+  aria-labelledby="dialog-product-title" aria-describedby="dialog-product-desc"
+  onclick="if (event.target === this) this.close()">
+  <div>
+    <header>
+      <h2 id="dialog-product-title">Add Product</h2>
+      <p id="dialog-product-desc">Add a new product to inventory.</p>
+    </header>
+
+    <!-- Close button as the header -->
+    <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+
+    <section>
+      <form class="grid gap-4 form" method="POST" action="../app/controllers/add_product.php" id="form-product">
+        <!-- Selecting Category -->
+        <div class="grid gap-3">
+          <label for="product-category" class="label">Category<span class="text-red-500">*</span></label>
+          <select class="input" id="product-category" name="category_id" required>
+            <option value="" disabled>Select category</option>
+            <?php foreach ($categories as $c): ?>
+              <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['name']); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <!-- SKU or Product ID -->
+        <div class="grid gap-3">
+          <label for="product-sku" class="label">SKU<span class="text-red-500">*</span></label>
+          <input
+            class="input"
+            id="product-sku"
+            type="text"
+            name="sku"
+            placeholder="e.g., PROD-001"
+            required
+            minlength="2"
+            maxlength="50"
+            pattern="^[A-Z0-9\-]+$"
+            title="SKU: Uppercase letters, numbers, and hyphens only."
+            autocomplete="off" />
+        </div>
+
+        <!-- Product Name -->
+        <div class="grid gap-3">
+          <label for="product-name" class="label">Product Name<span class="text-red-500">*</span></label>
+          <input
+            class="input"
+            id="product-name"
+            type="text"
+            name="name"
+            placeholder="Enter product name"
+            required
+            minlength="2"
+            maxlength="100"
+            pattern="^[a-zA-Z0-9\s.\-&(),/]+$"
+            title="Product name: Alphanumeric and basic symbols only." />
+        </div>
+
+        <!-- Base Unit -->
+        <div class="grid gap-3">
+          <label for="product-unit" class="label">Base Unit</label>
+          <input
+            class="input"
+            id="product-unit"
+            type="text"
+            name="base_unit"
+            placeholder="pcs, kg, box/set"
+            maxlength="20"
+            pattern="^[a-zA-Z0-9\s/]+$"
+            title="Unit: Letters, numbers, spaces, and slashes only." />
+        </div>
+
+        <!-- Minimum Stock Level -->
+        <div class="grid gap-3">
+          <label for="product-min-stock" class="label">Min Stock Level</label>
+          <input
+            class="input"
+            id="product-min-stock"
+            type="number"
+            name="min_stock_level"
+            placeholder="0"
+            min="0"
+            max="999999"
+            value="0" />
+        </div>
+      </form>
+    </section>
+
+    <!-- Dialog Footer -->
+    <footer>
+      <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+      <button type="submit" form="form-product" class="btn">Save Product</button>
+    </footer>
+  </div>
+</dialog>
+```
+
+</Tab>
+<Tab value="batches.php">
+
+```php title="app/views/batches.php"
+<!--
+Batches Table Rendering
+This file is included by index.php based on GET parameter
+Variables available: $batches (array of batch data)
+-->
+
+<?php if (empty($batches)): ?>
+  <div class="flex flex-col items-center justify-center flex-1 min-w-0 gap-6 p-6 text-center border-dashed rounded-lg text-balance md:p-12">
+    <header class="flex flex-col items-center max-w-sm gap-2 text-center">
+      <h3 class="text-lg font-medium tracking-tight">No Batches</h3>
+      <p class="text-muted-foreground text-sm/relaxed">Create your first batch to get started.</p>
+    </header>
+  </div>
+<?php else: ?>
+  <table class="table">
+    <caption>Batches</caption>
+    <thead>
+      <tr>
+        <th>Batch Code</th>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Supplier</th>
+        <th>Received</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($batches as $b): ?>
+        <tr>
+          <td><?php echo htmlspecialchars($b['batch_code'] ?? '-'); ?></td>
+          <td><?php echo htmlspecialchars($b['product_name'] ?? '-'); ?></td>
+          <td><?php echo $b['qty']; ?></td>
+          <td><?php echo htmlspecialchars($b['supplier_name'] ?? '-'); ?></td>
+          <td><?php echo date('M d, Y', strtotime($b['received_date'])); ?></td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+<?php endif; ?>
+
+<!-- ================= DIALOG: ADD BATCH ================= -->
+<dialog id="dialog-add-batch" class="dialog w-full sm:max-w-[425px]"
+  aria-labelledby="dialog-batch-title" aria-describedby="dialog-batch-desc"
+  onclick="if (event.target === this) this.close()">
+  <div>
+    <header>
+      <h2 id="dialog-batch-title">Add Batch</h2>
+      <p id="dialog-batch-desc">Record a new batch/lot of products.</p>
+    </header>
+
+    <!-- Close button as the header -->
+    <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+
+    <section>
+      <form class="grid gap-4 form" method="POST" action="../app/controllers/add_batch.php" id="form-batch">
+        <!-- Product -->
+        <div class="grid gap-3">
+          <label for="batch-product" class="label">Product<span class="text-red-500">*</span></label>
+          <select class="input" id="batch-product" name="product_id" required>
+            <option value="" disabled>Select product</option>
+            <?php foreach ($products as $p): ?>
+              <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <!-- Supplier -->
+        <div class="grid gap-3">
+          <label for="batch-supplier" class="label">Supplier<span class="text-red-500">*</span></label>
+          <select class="input" id="batch-supplier" name="supplier_id" required>
+            <option value="" disabled>Select supplier</option>
+            <?php foreach ($suppliers as $s): ?>
+              <option value="<?php echo $s['id']; ?>"><?php echo htmlspecialchars($s['name']); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <!-- Batch Code -->
+        <div class="grid gap-3">
+          <label for="batch-code" class="label">Batch Code</label>
+          <input
+            class="input"
+            id="batch-code"
+            type="text"
+            name="batch_code"
+            placeholder="e.g., LOT001"
+            maxlength="50"
+            pattern="^[a-zA-Z0-9\-]+$"
+            title="Batch code: alphanumeric + hyphens only"
+            autocomplete="off" />
+        </div>
+
+        <!-- Quantity -->
+        <div class="grid gap-3">
+          <label for="batch-qty" class="label">Quantity<span class="text-red-500">*</span></label>
+          <input
+            class="input"
+            id="batch-qty"
+            type="number"
+            name="qty"
+            placeholder="0"
+            required
+            min="1"
+            max="999999"
+            title="Quantity: must be 1 or greater" />
+        </div>
+      </form>
+    </section>
+
+    <!-- Dialog Footer -->
+    <footer>
+      <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+      <button type="submit" form="form-batch" class="btn">Save Batch</button>
+    </footer>
+  </div>
+</dialog>
+```
+
+</Tab>
+<Tab value="mermaid.php">
+
+```php title="app/views/mermaid.php"
+<!-- Class "mermaid" enables automatic rendering -->
+<div class="mermaid mx-auto my-8 w-full max-w-4xl">
+  erDiagram
+  suppliers ||--o{ batches : supplies
+  categories ||--o{ products : contains
+  products ||--o{ batches : has
+
+  %% FK delete behavior from schema:
+  %% categories.id -> products.category_id ON DELETE CASCADE
+  %% products.id -> batches.product_id ON DELETE CASCADE
+  %% suppliers.id -> batches.supplier_id ON DELETE CASCADE
+
+  suppliers {
+  int id PK "AUTO_INCREMENT"
+  varchar(100) name "NOT NULL"
+  varchar(100) contact_person
+  varchar(20) phone
+  }
+  categories {
+  int id PK "AUTO_INCREMENT"
+  varchar(50) name "NOT NULL"
+  timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+  }
+  products {
+  int id PK "AUTO_INCREMENT"
+  int category_id FK "NOT NULL"
+  varchar(50) sku UK "NOT NULL"
+  varchar(100) name "NOT NULL"
+  varchar(20) base_unit
+  int min_stock_level "DEFAULT 0, CHECK >= 0"
+  }
+  batches {
+  int id PK "AUTO_INCREMENT"
+  int product_id FK "NOT NULL"
+  int supplier_id FK "NOT NULL"
+  varchar(50) batch_code
+  int qty "NOT NULL, CHECK >= 1"
+  timestamp received_date "DEFAULT CURRENT_TIMESTAMP"
+  }
+</div>
+
+<!-- Load Mermaid.js from CDN -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: true
+  });
+</script>
+```
+
+</Tab>
+</Tabs>
+
+##### database scripts
+
+<Tabs items={['database_setup.sql', 'hardware_store_seeder.sql', 'reset_tables.sql']}>
+<Tab value="database_setup.sql">
+
+```sql title="database/database_setup.sql"
+-- Case Problem #1: Inventory Management Database (Simplified + Aligned)
+-- Database: inventory
+-- Updated: lengths strict, CHECK constraints added (MySQL 8.0.16+)
+
+CREATE DATABASE IF NOT EXISTS inventory;
+USE inventory;
+
+-- suppliers
+CREATE TABLE IF NOT EXISTS suppliers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  contact_person VARCHAR(100),
+  phone VARCHAR(20)
+);
+
+-- categories (length reduced to match form)
+CREATE TABLE IF NOT EXISTS categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- products (name 100, base_unit 20)
+CREATE TABLE IF NOT EXISTS products (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  category_id INT NOT NULL,
+  sku VARCHAR(50) NOT NULL UNIQUE,
+  name VARCHAR(100) NOT NULL,
+  base_unit VARCHAR(20),
+  min_stock_level INT DEFAULT 0,
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+  CONSTRAINT chk_min_stock CHECK (min_stock_level >= 0)
+);
+
+-- batches (batch_code 50, qty >= 1)
+CREATE TABLE IF NOT EXISTS batches (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  supplier_id INT NOT NULL,
+  batch_code VARCHAR(50),
+  qty INT NOT NULL,
+  received_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE CASCADE,
+  CONSTRAINT chk_qty_positive CHECK (qty >= 1)
+);
+```
+
+</Tab>
+<Tab value="hardware_store_seeder.sql">
+
+```sql title="database/hardware_store_seeder.sql"
+-- hardware_store_seeder.sql
+USE inventory;
+
+-- 1. Suppliers (Mga sikat na hardware brands/distributors)
+INSERT INTO suppliers (name, contact_person, phone) VALUES
+('Davies Paints Philippines', 'Elena Reyes', '+639175551234'),
+('Phelps Dodge Electrical', 'Mark Castro', '+639284445678'),
+('Republic Cement Corp', 'Joey Santos', '+639393339012'),
+('Apex Tools & Equipment', 'Lina Gomez', '+639452228899'),
+('Solid Steel Philippines', 'Kevin Sy', '+639171117766'),
+('PVC King Manufacturing', 'Sarah Lim', '+63287654321');
+
+-- 2. Categories (Iba't ibang section ng hardware)
+INSERT INTO categories (name, created_at) VALUES
+('Electrical Supplies', '2026-03-22 08:00:00'),
+('Plumbing & Sanitary', '2026-03-22 08:30:00'),
+('Paints & Coatings', '2026-03-22 09:00:00'),
+('Masonry & Cement', '2026-03-22 09:30:00'),
+('Hand & Power Tools', '2026-03-22 10:00:00'),
+('Fasteners & Nails', '2026-03-22 10:30:00');
+
+-- 3. Products (Highlighting various Base Units)
+-- Units: roll, pcs, gallon, bag, unit, kg
+INSERT INTO products (category_id, sku, name, base_unit, min_stock_level) VALUES
+(1, 'ELE-THHN-14-WHT', 'THHN Wire #14 White (150m)', 'roll', 5),
+(2, 'PLU-PVC-BLUE-12', 'PVC Pipe Blue 1/2 inch', 'pcs', 50),
+(3, 'PNT-DAV-WHT-GL', 'Davies Megacryl White', 'gallon', 20),
+(4, 'MAS-CEMENT-PORT', 'Portland Cement High Strength', 'bag', 100),
+(5, 'TL-MAK-DRILL-13', 'Makita Hammer Drill 13mm', 'unit', 3),
+(6, 'FAS-NAILS-CW-3', 'Common Wire Nails 3 inch', 'kg', 25),
+(3, 'PNT-THINNER-1L', 'Paint Thinner Premium', 'bottle', 15),
+(1, 'ELE-SWITCH-1G', 'Wide Series 1-Gang Switch', 'pcs', 30);
+
+-- 4. Batches (Stocks arrival)
+INSERT INTO batches (product_id, supplier_id, batch_code, qty, received_date) VALUES
+(1, 2, 'BT-ELE-2026-001', 10, '2026-03-01 09:00:00'),
+(4, 3, 'CMNT-LOT-A1', 200, '2026-03-05 14:00:00'),
+(3, 1, 'DV-PNT-MAR-B1', 40, '2026-03-10 10:30:00'),
+(6, 5, 'NAIL-3IN-2026', 100, '2026-03-12 11:45:00'),
+(5, 4, 'MAK-DRILL-X9', 5, '2026-03-15 13:20:00'),
+(2, 6, 'PVC-B-12-MAR', 150, '2026-03-18 08:30:00'),
+(8, 2, 'ELE-SW-044', 60, '2026-03-20 16:00:00'),
+(4, 3, 'CMNT-LOT-A2', 150, '2026-03-22 11:00:00');
+```
+
+</Tab>
+<Tab value="reset_tables.sql">
+
+```sql title="database/reset_tables.sql"
+-- Reset all tables for Inventory Management System (Simplified)
+
+-- 1. Disable the guards
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 2. Delete all data
+DELETE FROM batches;
+DELETE FROM products;
+DELETE FROM categories;
+DELETE FROM suppliers;
+
+-- 3. Reset the counters to 1
+ALTER TABLE batches AUTO_INCREMENT = 1;
+ALTER TABLE products AUTO_INCREMENT = 1;
+ALTER TABLE categories AUTO_INCREMENT = 1;
+ALTER TABLE suppliers AUTO_INCREMENT = 1;
+
+-- 4. Re-enable the guards
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+</Tab>
+</Tabs>
+
+---
+
+#### routes
+
+- http://localhost/case-problems/case-1/public/index.php
+- http://localhost/case-problems/case-1/public/index.php?view=suppliers
+- http://localhost/case-problems/case-1/public/index.php?view=categories
+- http://localhost/case-problems/case-1/public/index.php?view=products
+- http://localhost/case-problems/case-1/public/index.php?view=batches
+- http://localhost/case-problems/case-1/public/index.php?view=mermaid
+
+---
+
+#### github repository
+
+- https://github.com/cedricangulo/itwst03-case-problems

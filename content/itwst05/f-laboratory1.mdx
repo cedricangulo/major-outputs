@@ -1,0 +1,391 @@
+---
+title: Laboratory 1
+description: Demonstrate SQL injection in an unsafe READ page and secure it using prepared statements
+difficulty: medium
+files: 5
+---
+
+#### laboratory objective
+
+1. Create a READ page with a search field.
+2. Use direct SQL string concatenation in the first version to show SQL injection risk.
+3. Test using malicious input.
+4. Create a second READ page using prepared statements.
+5. Use the same malicious input again and compare results.
+
+#### insertion demo (for presentation readiness)
+
+This part is optional for discussion, but useful during reporting to connect the module topic.
+
+1. Show unsafe insertion using direct SQL concatenation.
+2. Show safe insertion using prepared statements.
+3. Use the same injected value and compare inserted records.
+
+---
+
+#### file structure
+
+<Files className="mt-4">
+  <Folder name="lesson5-lab" defaultOpen>
+    <File name="unsafe_read.php" />
+    <File name="safe_read.php" />
+        <File name="unsafe_insert.php" />
+        <File name="safe_insert.php" />
+    <File name="database_setup.sql" />
+  </Folder>
+</Files>
+
+---
+
+#### code
+
+<Tabs items={['unsafe_read.php', 'safe_read.php', 'unsafe_insert.php', 'safe_insert.php', 'database_setup.sql']}>
+<Tab value="unsafe_read.php">
+
+```php title="unsafe_read.php"
+<?php
+$con = mysqli_connect("localhost", "root", "", "lesson5");
+
+if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$input = $_GET['search'] ?? '';
+$sql = "SELECT * FROM sample WHERE value LIKE '%$input%'";
+$result = mysqli_query($con, $sql);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsafe View Demo</title>
+</head>
+<body>
+    <h1>Unsafe READ Demo</h1>
+
+    <form method="get">
+        <input type="text" name="search" placeholder="Search value">
+        <button type="submit">Search</button>
+    </form>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php if ($result && mysqli_num_rows($result) > 0): ?>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                <tr>
+                    <td><?php echo $row['id']; ?></td>
+                    <td><?php echo $row['value']; ?></td>
+                </tr>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="2">No records found.</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</body>
+</html>
+```
+
+</Tab>
+<Tab value="safe_read.php">
+
+```php title="safe_read.php"
+<?php
+$con = mysqli_connect("localhost", "root", "", "lesson5");
+
+if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$input = $_GET['search'] ?? '';
+$search = "%$input%";
+
+$stmt = mysqli_prepare($con, "SELECT * FROM sample WHERE value LIKE ?");
+mysqli_stmt_bind_param($stmt, "s", $search);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe View Demo</title>
+</head>
+<body>
+    <h1>Prepared Statement READ Demo</h1>
+
+    <form method="get">
+        <input type="text" name="search" placeholder="Search value">
+        <button type="submit">Search</button>
+    </form>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php if ($result && mysqli_num_rows($result) > 0): ?>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                <tr>
+                    <td><?php echo $row['id']; ?></td>
+                    <td><?php echo $row['value']; ?></td>
+                </tr>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="2">No records found.</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</body>
+</html>
+```
+
+</Tab>
+<Tab value="unsafe_insert.php">
+
+```php title="unsafe_insert.php"
+<?php
+$con = mysqli_connect("localhost", "root", "", "lesson5");
+
+if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$message = "";
+
+if (isset($_POST['go'])) {
+    $input = $_POST['myInput'] ?? '';
+
+    if ($input === '') {
+        $message = "Input is required.";
+    } else {
+        $sql = "INSERT INTO sample (value) VALUES ('$input')";
+        if (mysqli_query($con, $sql)) {
+            $message = "Inserted using unsafe query.";
+        } else {
+            $message = "Error: " . mysqli_error($con);
+        }
+    }
+}
+
+$result = mysqli_query($con, "SELECT id, value FROM sample ORDER BY id DESC LIMIT 10");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsafe Insert Demo</title>
+</head>
+<body>
+    <h1>Unsafe INSERT Demo</h1>
+
+    <form method="post">
+        <input type="text" name="myInput" placeholder="Enter value">
+        <button type="submit" name="go">Insert</button>
+    </form>
+
+    <p><?php echo htmlspecialchars($message); ?></p>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php if ($result && mysqli_num_rows($result) > 0): ?>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                <tr>
+                    <td><?php echo $row['id']; ?></td>
+                    <td><?php echo htmlspecialchars($row['value']); ?></td>
+                </tr>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="2">No records found.</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</body>
+</html>
+```
+
+</Tab>
+<Tab value="safe_insert.php">
+
+```php title="safe_insert.php"
+<?php
+$con = mysqli_connect("localhost", "root", "", "lesson5");
+
+if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$message = "";
+
+if (isset($_POST['go'])) {
+    $input = $_POST['myInput'] ?? '';
+
+    if ($input === '') {
+        $message = "Input is required.";
+    } else {
+        $stmt = mysqli_prepare($con, "INSERT INTO sample (value) VALUES (?)");
+        mysqli_stmt_bind_param($stmt, "s", $input);
+
+        if (mysqli_stmt_execute($stmt)) {
+            $message = "Inserted using prepared statement.";
+        } else {
+            $message = "Error: " . mysqli_error($con);
+        }
+
+        mysqli_stmt_close($stmt);
+    }
+}
+
+$result = mysqli_query($con, "SELECT id, value FROM sample ORDER BY id DESC LIMIT 10");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Insert Demo</title>
+</head>
+<body>
+    <h1>Prepared Statement INSERT Demo</h1>
+
+    <form method="post">
+        <input type="text" name="myInput" placeholder="Enter value">
+        <button type="submit" name="go">Insert</button>
+    </form>
+
+    <p><?php echo htmlspecialchars($message); ?></p>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php if ($result && mysqli_num_rows($result) > 0): ?>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                <tr>
+                    <td><?php echo $row['id']; ?></td>
+                    <td><?php echo htmlspecialchars($row['value']); ?></td>
+                </tr>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="2">No records found.</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</body>
+</html>
+```
+
+</Tab>
+<Tab value="database_setup.sql">
+
+```sql title="database_setup.sql"
+CREATE DATABASE IF NOT EXISTS lesson5;
+USE lesson5;
+
+CREATE TABLE sample (
+  id INT(11) AUTO_INCREMENT PRIMARY KEY,
+  value VARCHAR(255) NOT NULL
+);
+```
+
+</Tab>
+</Tabs>
+
+---
+
+#### test input
+
+Use these payloads in READ pages (`unsafe_read.php` and `safe_read.php`):
+
+```text
+' OR '1'='1
+```
+
+```text
+' OR 1=1 -- 
+```
+
+```text
+' UNION SELECT 999,'injected' -- 
+```
+
+```text
+%'
+```
+
+Use these payloads in INSERT pages (`unsafe_insert.php` and `safe_insert.php`):
+
+```text
+hello'),('hacked
+```
+
+```text
+normal demo value
+```
+
+```text
+single'quote test
+```
+
+```text
+<script>alert('xss')</script>
+```
+
+---
+
+#### quick expected result guide
+
+- `unsafe_read.php`: injection payloads may return extra or manipulated rows.
+- `safe_read.php`: same payloads are treated as plain text.
+- `unsafe_insert.php`: `hello'),('hacked` can create multiple inserted rows.
+- `safe_insert.php`: `hello'),('hacked` is saved as one literal string value.
+- XSS-like text should appear as text in your table output, not run as script.
+
+---
+
+#### expected presentation flow
+
+1. Open unsafe_read.php.
+2. Search with normal text.
+3. Search using at least two payloads.
+4. Explain why direct concatenation is vulnerable.
+5. Open safe_read.php.
+6. Search using the same payload set.
+7. Explain why prepared statements keep SQL logic and user input separate.
+8. Open unsafe_insert.php and insert `hello'),('hacked`.
+9. Open safe_insert.php and insert the same value.
+10. Compare inserted rows and conclude the demo.
