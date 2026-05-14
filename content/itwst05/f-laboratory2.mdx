@@ -1,0 +1,71 @@
+---
+title: Laboratory 2
+difficulty: easy
+description: "A short hands-on lab that demonstrates storing and retrieving a value in PHP sessions using an input page and an output page."
+files: 2
+---
+
+This laboratory demonstrates a minimal PHP session workflow using two pages:
+
+- `input.php` — presents a form to accept a text value and store it in the session.
+- `output.php` — reads and displays the stored session value.
+
+```php title="input.php"
+<?php
+session_start();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input</title>
+</head>
+<body>
+    <h1>Input</h1>
+    <form method="post">
+        <input type="text" name="input" placeholder="Text" /><br />
+        <input type="submit" value="Submit" name="submit" /><br />
+        <input type="submit" value="Clear" name="clear" />
+    </form>
+    <a href="output.php">Check Output</a>
+</body>
+</html>
+
+<?php
+
+if (isset($_POST['submit'])) {
+    $_SESSION['value'] = $_POST['input'];
+}
+
+if (isset($_POST['clear'])) {
+    session_abort();
+    header("Location: input.php");
+    exit();
+}
+
+?>
+```
+
+```php title="output.php"
+<?php
+session_start();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output</title>
+</head>
+<body>
+    <h1>Output</h1>
+    <p>
+        <?= $_SESSION["value"] ?? "no session value found" ?>
+    </p>
+    <a href="input.php">Back to Input</a>
+</body>
+</html>
+```
