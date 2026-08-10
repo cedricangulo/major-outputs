@@ -1,11 +1,11 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
+import { GeistMono } from "geist/font/mono";
+import { GeistPixelSquare } from "geist/font/pixel";
+import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { ViewTransitions } from "next-view-transitions";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { Header } from "@/components/shared/header";
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
-import { GeistPixelSquare } from 'geist/font/pixel';
 
 import "./globals.css";
 
@@ -47,7 +47,12 @@ export const metadata: Metadata = {
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <ViewTransitions>
-      <html lang="en" suppressHydrationWarning className={fontVariables}>
+      <html
+        lang="en"
+        data-scroll-behavior="smooth"
+        suppressHydrationWarning
+        className={fontVariables}
+      >
         <body className="antialiased">
           <RootProvider>
             <Header />

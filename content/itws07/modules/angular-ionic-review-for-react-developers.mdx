@@ -1,0 +1,1247 @@
+---
+title: Angular and Ionic Review for React Developers
+description: Review guide comparing Angular and Ionic to React, with complete .ts and .html examples.
+---
+
+# Angular and Ionic Review for React Developers
+
+This guide explains the Angular and Ionic topics from the review using complete `.ts` and `.html` examples. Each topic includes a React comparison.
+
+## Quick React to Angular Comparison
+
+| React / Next.js | Angular / Ionic |
+|---|---|
+| `useState()` | `signal()` |
+| Derived state / `useMemo()` | `computed()` |
+| `useEffect()` | `effect()` |
+| Props | `@Input()` |
+| Callback props | `@Output()` |
+| Controlled inputs | `[(ngModel)]` |
+| React Hook Form | Reactive Forms |
+| Custom hooks | Services / injectable logic |
+| Context | Dependency Injection / providers |
+| JSX | Angular templates |
+| `onClick` | `(click)` |
+| `value={x}` | `[value]="x"` |
+| `{value}` | `{{ value }}` |
+| Conditional rendering | `@if` |
+| `.map()` | `@for` |
+| React component | Angular component |
+| Ionic React components | Ionic Angular components |
+
+---
+
+# 1. Signal
+
+Signals are Angular's reactive state mechanism.
+
+## Angular
+
+### `counter.component.ts`
+
+```ts
+import { Component, signal, computed } from '@angular/core';
+
+@Component({
+  selector: 'app-counter',
+  standalone: true,
+  templateUrl: './counter.component.html',
+})
+export class CounterComponent {
+  count = signal(0);
+
+  doubled = computed(() => this.count() * 2);
+
+  increment() {
+    this.count.update(value => value + 1);
+  }
+
+  decrement() {
+    this.count.update(value => value - 1);
+  }
+
+  reset() {
+    this.count.set(0);
+  }
+}
+```
+
+### `counter.component.html`
+
+```html
+<h2>Counter</h2>
+
+<p>Count: {{ count() }}</p>
+<p>Doubled: {{ doubled() }}</p>
+
+<button (click)="increment()">+</button>
+<button (click)="decrement()">-</button>
+<button (click)="reset()">Reset</button>
+```
+
+Important signal operations:
+
+```ts
+count = signal(0);
+
+count.set(10);
+
+count.update(value => value + 1);
+
+count();
+```
+
+Think of:
+
+```text
+signal()   = useState()
+computed() = derived state / useMemo()
+```
+
+Angular reads a signal by calling it:
+
+```html
+{{ count() }}
+```
+
+React reads state directly:
+
+```tsx
+{count}
+```
+
+---
+
+# 2. FormsModule
+
+Angular's `FormsModule` provides template-driven forms.
+
+## Angular
+
+### `login.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [FormsModule],
+  templateUrl: './login.component.html',
+})
+export class LoginComponent {
+  username = '';
+  password = '';
+
+  login() {
+    console.log('Username:', this.username);
+    console.log('Password:', this.password);
+  }
+}
+```
+
+### `login.component.html`
+
+```html
+<h2>Login</h2>
+
+<form (ngSubmit)="login()">
+  <div>
+    <label>Username</label>
+
+    <input
+      type="text"
+      name="username"
+      [(ngModel)]="username"
+    />
+  </div>
+
+  <div>
+    <label>Password</label>
+
+    <input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+    />
+  </div>
+
+  <button type="submit">
+    Login
+  </button>
+</form>
+
+<p>Username: {{ username }}</p>
+```
+
+The key syntax is:
+
+```html
+[(ngModel)]="username"
+```
+
+This is Angular two-way binding.
+
+React would normally use:
+
+```tsx
+<input
+  value={username}
+  onChange={e => setUsername(e.target.value)}
+/>
+```
+
+Angular combines the value and change behavior into:
+
+```html
+[(ngModel)]="username"
+```
+
+---
+
+# 3. Reactive Forms
+
+Reactive Forms are better suited to larger forms with validation.
+
+They are conceptually similar to React Hook Form, although the APIs differ.
+
+## Angular
+
+### `register.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+
+@Component({
+  selector: 'app-register',
+  standalone: true,
+  imports: [ReactiveFormsModule],
+  templateUrl: './register.component.html',
+})
+export class RegisterComponent {
+  registerForm = new FormGroup({
+    username: new FormControl('', Validators.required),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.email
+    ]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8)
+    ]),
+  });
+
+  register() {
+    if (this.registerForm.invalid) {
+      return;
+    }
+
+    console.log(this.registerForm.value);
+  }
+}
+```
+
+### `register.component.html`
+
+```html
+<h2>Register</h2>
+
+<form
+  [formGroup]="registerForm"
+  (ngSubmit)="register()"
+>
+  <div>
+    <label>Username</label>
+
+    <input
+      type="text"
+      formControlName="username"
+    />
+
+    @if (
+      registerForm.controls.username.touched &&
+      registerForm.controls.username.invalid
+    ) {
+      <p>Username is required.</p>
+    }
+  </div>
+
+  <div>
+    <label>Email</label>
+
+    <input
+      type="email"
+      formControlName="email"
+    />
+
+    @if (
+      registerForm.controls.email.touched &&
+      registerForm.controls.email.invalid
+    ) {
+      <p>Enter a valid email.</p>
+    }
+  </div>
+
+  <div>
+    <label>Password</label>
+
+    <input
+      type="password"
+      formControlName="password"
+    />
+
+    @if (
+      registerForm.controls.password.touched &&
+      registerForm.controls.password.invalid
+    ) {
+      <p>Password must be at least 8 characters.</p>
+    }
+  </div>
+
+  <button
+    type="submit"
+    [disabled]="registerForm.invalid"
+  >
+    Register
+  </button>
+</form>
+```
+
+Important Angular concepts:
+
+```html
+[formGroup]="registerForm"
+```
+
+Connects the HTML form to the TypeScript `FormGroup`.
+
+```html
+formControlName="username"
+```
+
+Connects an input to a specific `FormControl`.
+
+```html
+[disabled]="registerForm.invalid"
+```
+
+Uses property binding.
+
+```html
+@if (...) {
+}
+```
+
+Conditionally renders content.
+
+---
+
+# 4. Dynamic Component
+
+Angular can create a component dynamically at runtime.
+
+## Angular
+
+### `message.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-message',
+  standalone: true,
+  template: `
+    <div>
+      <h3>Hello from dynamically created component</h3>
+    </div>
+  `,
+})
+export class MessageComponent {}
+```
+
+### `app.component.ts`
+
+```ts
+import {
+  Component,
+  ViewContainerRef
+} from '@angular/core';
+
+import { MessageComponent } from './message.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+
+  constructor(
+    private viewContainer: ViewContainerRef
+  ) {}
+
+  showMessage() {
+    this.viewContainer.clear();
+
+    this.viewContainer.createComponent(
+      MessageComponent
+    );
+  }
+}
+```
+
+### `app.component.html`
+
+```html
+<h1>Dynamic Component</h1>
+
+<button (click)="showMessage()">
+  Show Message
+</button>
+```
+
+The flow is:
+
+```text
+showMessage()
+      ↓
+viewContainer.clear()
+      ↓
+createComponent(MessageComponent)
+      ↓
+MessageComponent appears
+```
+
+In React, you normally solve simpler cases with conditional rendering:
+
+```tsx
+{showMessage && <Message />}
+```
+
+Angular's dynamic component API becomes useful when you actually need runtime component creation, such as custom overlays, dialogs, and plugin-like UI.
+
+---
+
+# 5. `@Input()`, Parent to Child
+
+`@Input()` receives data from a parent component.
+
+## Angular
+
+### `user-card.component.ts`
+
+```ts
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-user-card',
+  standalone: true,
+  templateUrl: './user-card.component.html',
+})
+export class UserCardComponent {
+  @Input() name = '';
+  @Input() age = 0;
+}
+```
+
+### `user-card.component.html`
+
+```html
+<div>
+  <h3>{{ name }}</h3>
+  <p>Age: {{ age }}</p>
+</div>
+```
+
+### `app.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import { UserCardComponent } from './user-card.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [UserCardComponent],
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+  username = 'Cedric';
+  age = 21;
+}
+```
+
+### `app.component.html`
+
+```html
+<h1>User Profile</h1>
+
+<app-user-card
+  [name]="username"
+  [age]="age"
+></app-user-card>
+```
+
+This:
+
+```html
+[name]="username"
+```
+
+means:
+
+```text
+Parent's username
+       ↓
+Child's name
+```
+
+React equivalent:
+
+```tsx
+<UserCard
+  name={username}
+  age={age}
+/>
+```
+
+The key rule:
+
+```text
+@Input = Parent → Child
+```
+
+---
+
+# 6. `@Output()`, Child to Parent
+
+`@Output()` allows a child component to emit an event to its parent.
+
+## Angular
+
+### `user-card.component.ts`
+
+```ts
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
+
+@Component({
+  selector: 'app-user-card',
+  standalone: true,
+  templateUrl: './user-card.component.html',
+})
+export class UserCardComponent {
+  @Input() name = '';
+
+  @Output() selected = new EventEmitter<string>();
+
+  selectUser() {
+    this.selected.emit(this.name);
+  }
+}
+```
+
+### `user-card.component.html`
+
+```html
+<div>
+  <h3>{{ name }}</h3>
+
+  <button (click)="selectUser()">
+    Select
+  </button>
+</div>
+```
+
+### `app.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import { UserCardComponent } from './user-card.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [UserCardComponent],
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+  selectedUser = '';
+
+  handleUserSelected(name: string) {
+    this.selectedUser = name;
+  }
+}
+```
+
+### `app.component.html`
+
+```html
+<h1>Users</h1>
+
+<app-user-card
+  [name]="'Cedric'"
+  (selected)="handleUserSelected($event)"
+></app-user-card>
+
+<p>
+  Selected user: {{ selectedUser }}
+</p>
+```
+
+The data flow:
+
+```text
+Parent
+   ↓
+@Input
+   ↓
+Child
+   ↓
+@Output
+   ↓
+Parent
+```
+
+React equivalent:
+
+```tsx
+<Child onSelected={handleUserSelected} />
+```
+
+The key rule:
+
+```text
+@Input  = Parent → Child
+@Output = Child → Parent
+```
+
+---
+
+# 7. Two-Way Binding
+
+Two-way binding synchronizes component state and UI state.
+
+## Angular
+
+### `profile.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-profile',
+  standalone: true,
+  imports: [FormsModule],
+  templateUrl: './profile.component.html',
+})
+export class ProfileComponent {
+  username = '';
+
+  save() {
+    console.log(this.username);
+  }
+}
+```
+
+### `profile.component.html`
+
+```html
+<h2>Profile</h2>
+
+<input
+  type="text"
+  name="username"
+  [(ngModel)]="username"
+/>
+
+<p>
+  Username: {{ username }}
+</p>
+
+<button (click)="save()">
+  Save
+</button>
+```
+
+The important syntax:
+
+```html
+[(ngModel)]="username"
+```
+
+Angular's banana-in-a-box syntax combines property binding and event binding.
+
+Conceptually:
+
+```html
+[ngModel]="username"
+(ngModelChange)="username = $event"
+```
+
+React normally writes both parts:
+
+```tsx
+<input
+  value={username}
+  onChange={e => setUsername(e.target.value)}
+/>
+```
+
+So remember:
+
+```text
+Angular: [(ngModel)]
+React:   value + onChange
+```
+
+---
+
+# 8. Services
+
+Services hold reusable application logic.
+
+## Angular
+
+### `user.service.ts`
+
+```ts
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+
+  private users = [
+    {
+      id: 1,
+      name: 'Cedric'
+    },
+    {
+      id: 2,
+      name: 'John'
+    }
+  ];
+
+  getUsers() {
+    return this.users;
+  }
+
+  addUser(name: string) {
+    this.users.push({
+      id: this.users.length + 1,
+      name
+    });
+  }
+}
+```
+
+### `app.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import { UserService } from './user.service';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+
+  users = this.userService.getUsers();
+
+  constructor(
+    private userService: UserService
+  ) {}
+
+  addUser() {
+    this.userService.addUser('Alice');
+
+    this.users = this.userService.getUsers();
+  }
+}
+```
+
+### `app.component.html`
+
+```html
+<h1>Users</h1>
+
+<button (click)="addUser()">
+  Add User
+</button>
+
+<ul>
+  @for (user of users; track user.id) {
+    <li>{{ user.name }}</li>
+  }
+</ul>
+```
+
+The important part is:
+
+```ts
+constructor(
+  private userService: UserService
+) {}
+```
+
+Angular's Dependency Injection system provides the `UserService`.
+
+You normally do not create it manually with:
+
+```ts
+new UserService()
+```
+
+---
+
+# 9. Service with Signals
+
+This is a useful modern Angular pattern.
+
+The service owns the reactive state.
+
+## Angular
+
+### `user.service.ts`
+
+```ts
+import {
+  Injectable,
+  signal,
+  computed
+} from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+
+  users = signal([
+    { id: 1, name: 'Cedric' },
+    { id: 2, name: 'John' }
+  ]);
+
+  userCount = computed(() => this.users().length);
+
+  addUser(name: string) {
+    this.users.update(users => [
+      ...users,
+      {
+        id: users.length + 1,
+        name
+      }
+    ]);
+  }
+}
+```
+
+### `app.component.ts`
+
+```ts
+import { Component } from '@angular/core';
+import { UserService } from './user.service';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+
+  constructor(
+    public userService: UserService
+  ) {}
+
+  addUser() {
+    this.userService.addUser('Alice');
+  }
+}
+```
+
+### `app.component.html`
+
+```html
+<h1>Users</h1>
+
+<p>
+  Total users: {{ userService.userCount() }}
+</p>
+
+<button (click)="addUser()">
+  Add User
+</button>
+
+<ul>
+  @for (user of userService.users(); track user.id) {
+    <li>{{ user.name }}</li>
+  }
+</ul>
+```
+
+Notice that the component does not manually synchronize its `users` variable.
+
+The service owns the state:
+
+```ts
+users = signal([...]);
+```
+
+The template reads the state:
+
+```html
+userService.users()
+```
+
+When the signal changes, Angular updates the UI.
+
+---
+
+# 10. Ionic + Angular
+
+Ionic provides UI components. Angular provides the application framework.
+
+For example:
+
+```html
+<ion-button>
+  Add User
+</ion-button>
+```
+
+is an Ionic component.
+
+The Angular logic controls the state and behavior around it.
+
+## Angular + Ionic
+
+### `home.page.ts`
+
+```ts
+import {
+  Component,
+  signal
+} from '@angular/core';
+
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonInput,
+  IonButton,
+  IonList,
+  IonItem,
+  IonLabel
+} from '@ionic/angular/standalone';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.page.html',
+  standalone: true,
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonInput,
+    IonButton,
+    IonList,
+    IonItem,
+    IonLabel
+  ]
+})
+export class HomePage {
+
+  name = signal('');
+
+  users = signal<string[]>([]);
+
+  addUser() {
+    const name = this.name().trim();
+
+    if (!name) {
+      return;
+    }
+
+    this.users.update(users => [
+      ...users,
+      name
+    ]);
+
+    this.name.set('');
+  }
+}
+```
+
+### `home.page.html`
+
+```html
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Users
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-input
+    label="Name"
+    placeholder="Enter your name"
+    [value]="name()"
+    (ionInput)="name.set($event.detail.value ?? '')"
+  />
+
+  <ion-button
+    expand="block"
+    (click)="addUser()"
+  >
+    Add User
+  </ion-button>
+
+  <ion-list>
+
+    @for (user of users(); track $index) {
+      <ion-item>
+        <ion-label>
+          {{ user }}
+        </ion-label>
+      </ion-item>
+    }
+
+  </ion-list>
+
+</ion-content>
+```
+
+The architecture is roughly:
+
+```text
+Ionic
+  ↓
+UI components
+  ↓
+Angular
+  ↓
+Components
+Signals
+Services
+Forms
+Dependency Injection
+  ↓
+Your application logic
+```
+
+---
+
+# React vs Angular Mental Model
+
+If you already know React, use these translations while studying.
+
+```text
+React / Next.js                Angular
+
+useState()                 →   signal()
+useMemo()                  →   computed()
+useEffect()                →   effect()
+
+props                      →   @Input()
+callback props             →   @Output()
+
+controlled input           →   [(ngModel)]
+React Hook Form            →   Reactive Forms
+
+custom hook                →   service
+Context                    →   Dependency Injection
+
+JSX                        →   HTML template
+
+onClick                    →   (click)
+onChange                   →   (change)
+value={x}                  →   [value]="x"
+className                  →   class
+
+{value}                    →   {{ value }}
+
+condition && <Component>   →   @if
+
+array.map()                →   @for
+```
+
+# Key Angular Template Syntax
+
+These are worth memorizing.
+
+## Interpolation
+
+```html
+<p>{{ username }}</p>
+```
+
+Displays a value.
+
+React:
+
+```tsx
+<p>{username}</p>
+```
+
+## Property binding
+
+```html
+<button [disabled]="isLoading">
+  Submit
+</button>
+```
+
+React:
+
+```tsx
+<button disabled={isLoading}>
+  Submit
+</button>
+```
+
+## Event binding
+
+```html
+<button (click)="submit()">
+  Submit
+</button>
+```
+
+React:
+
+```tsx
+<button onClick={submit}>
+  Submit
+</button>
+```
+
+## Two-way binding
+
+```html
+<input [(ngModel)]="username">
+```
+
+React:
+
+```tsx
+<input
+  value={username}
+  onChange={e => setUsername(e.target.value)}
+/>
+```
+
+## Conditional rendering
+
+Modern Angular:
+
+```html
+@if (isLoggedIn) {
+  <p>Welcome</p>
+} @else {
+  <p>Please log in</p>
+}
+```
+
+React:
+
+```tsx
+{isLoggedIn ? (
+  <p>Welcome</p>
+) : (
+  <p>Please log in</p>
+)}
+```
+
+## Looping
+
+Angular:
+
+```html
+@for (user of users; track user.id) {
+  <p>{{ user.name }}</p>
+}
+```
+
+React:
+
+```tsx
+{users.map(user => (
+  <p key={user.id}>{user.name}</p>
+))}
+```
+
+# Exam Cheat Sheet
+
+```text
+Signal
+Reactive state in Angular.
+
+computed()
+Derived state based on signals.
+
+effect()
+Runs side effects when signals change.
+
+FormsModule
+Template-driven Angular forms.
+
+ReactiveFormsModule
+Programmatic forms with FormGroup, FormControl, and validators.
+
+Dynamic Component
+Creates components at runtime.
+
+@Input()
+Passes data from parent to child.
+
+@Output()
+Sends events from child to parent.
+
+Two-way Binding
+Keeps component state and UI state synchronized.
+
+Service
+Reusable application logic or shared state.
+
+Dependency Injection
+Angular provides required services to components.
+
+Ionic
+UI framework that provides mobile-oriented components such as ion-button, ion-input, ion-modal, and ion-list.
+```
+
+# Priority for a React Developer
+
+Study these first:
+
+1. `signal()`
+2. `@Input()`
+3. `@Output()`
+4. Two-way binding
+5. Angular forms
+6. Services
+7. Dependency Injection
+8. Angular template syntax
+9. Dynamic components
+
+The most important mental shift is that Angular gives you a larger framework structure than React. React mainly gives you the component and rendering model. Angular gives you components, templates, forms, dependency injection, services, routing, HTTP tooling, and other application-level patterns as part of the framework.

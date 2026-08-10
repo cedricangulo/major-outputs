@@ -78,4 +78,11 @@ export const courseSections = [
     section: "3C",
     laboratoriesLink: "/itwst05",
   },
+  {
+    subject: "IT-WS07",
+    year: "2026-2027 1st sem",
+    teacher: "Angelito I. Cunanan Jr.",
+    section: "4C",
+    laboratoriesLink: "/itws07",
+  },
 ];

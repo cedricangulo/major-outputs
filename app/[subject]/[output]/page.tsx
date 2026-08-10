@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ViewOptions } from "@/components/ai/page-actions";
-import { VisitTracker } from "@/components/shared/visit-tracker";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { SubjectHeader } from "@/components/shared/subject-header";
-import { getVisitCount } from "@/lib/views";
+import { VisitTracker } from "@/components/shared/visit-tracker";
 import { getSource, validSubjects } from "@/lib/source";
 import { formatSubject } from "@/lib/utils";
+import { getVisitCount } from "@/lib/views";
 import { getMDXComponents } from "@/mdx-components";
 
 type Frontmatter = {
@@ -43,10 +43,8 @@ const OutputPage = async ({ params }: Props) => {
   const frontmatter = page.data as Frontmatter;
   const { description, difficulty, files } = frontmatter;
   const filePath = `${subject}/${output}.mdx`;
-  const githubUrl =
-    `https://github.com/cedricangulo/major-outputs/blob/main/content/${filePath}`;
-  const markdownUrl =
-    `https://raw.githubusercontent.com/cedricangulo/major-outputs/main/content/${filePath}`;
+  const githubUrl = `https://github.com/cedricangulo/major-outputs/blob/main/content/${filePath}`;
+  const markdownUrl = `https://raw.githubusercontent.com/cedricangulo/major-outputs/main/content/${filePath}`;
   const visitCount = await getVisitCount(subject, output);
 
   return (
@@ -55,7 +53,9 @@ const OutputPage = async ({ params }: Props) => {
         subject={subject}
         title={page.data.title}
         backHref={`/${subject}`}
-        actions={<ViewOptions markdownUrl={markdownUrl} githubUrl={githubUrl} />}
+        actions={
+          <ViewOptions markdownUrl={markdownUrl} githubUrl={githubUrl} />
+        }
         contentMeta={{
           description,
           difficulty,

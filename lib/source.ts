@@ -1,7 +1,6 @@
-import { cache } from "react";
-
 import { docs } from "fumadocs-mdx:collections/server";
 import { loader, update } from "fumadocs-core/source";
+import { cache } from "react";
 
 export const validSubjects = [
   "cc104",
@@ -15,6 +14,7 @@ export const validSubjects = [
   "itwst02",
   "itwst03",
   "itwst05",
+  "itws07",
 ] as const;
 
 export const getSource = cache(function getSource(subject: string) {
