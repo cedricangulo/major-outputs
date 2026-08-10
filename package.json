@@ -2,6 +2,10 @@
   "name": "major-outputs",
   "version": "0.2.0",
   "private": true,
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "build": "next build --turbopack",
     "dev": "next dev --turbopack",
